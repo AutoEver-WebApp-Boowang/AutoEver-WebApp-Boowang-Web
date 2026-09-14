@@ -1,1 +1,25 @@
+.panel {
+    display: flex;
+    flex-direction: column;
 
+    height: 100%;
+    min-height: 0;
+}
+
+.searchForm {
+    flex-shrink: 0;
+}
+
+.listHeader {
+    flex-shrink: 0;
+}
+
+.parkingList {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
