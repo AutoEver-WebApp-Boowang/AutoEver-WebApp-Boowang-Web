@@ -1,0 +1,121 @@
+.Card {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    gap: var(--spacing-card-row);
+    padding: var(--spacing-card-padding);
+    overflow: hidden;
+    color: var(--color-text-primary);
+    background-color: var(--color-background-panel);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-large);
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.Card:hover {
+    border-color: var(--color-border-hover);
+}
+
+.thumbnail {
+    display: block;
+    width: 100%;
+    height: 144px;
+    object-fit: cover;
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-medium);
+    aspect-ratio: 2 / 1;
+}
+
+.header {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-card-gap);
+}
+
+.name {
+    margin: 0;
+    overflow: hidden;
+    font-size: var(--font-size-card-title);
+    font-weight: var(--font-weight-semibold);
+    line-height: 18px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.distanceMeters {
+    flex-shrink: 0;
+    color: var(--color-text-supporting);
+    font-size: var(--font-size-meta);
+    line-height: 18px;
+}
+
+.attributes,
+.hours,
+.likes {
+    display: flex;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.attributes {
+    flex-wrap: wrap;
+    gap: var(--spacing-card-row);
+}
+
+.attributes li {
+    padding: 2px 8px;
+    color: var(--color-text-secondary);
+    background-color: var(--color-background-neutral);
+    border-radius: var(--radius-small);
+    font-size: var(--font-size-caption);
+    font-weight: var(--font-weight-regular);
+    line-height: 15px;
+    white-space: nowrap;
+}
+
+.attributes .publicBadge {
+    color: var(--color-badge-public-text);
+    background-color: var(--color-badge-public-background);
+    font-weight: var(--font-weight-semibold);
+}
+
+.attributes .userBadge {
+    color: var(--color-badge-user-text);
+    background-color: var(--color-badge-user-background);
+    font-weight: var(--font-weight-semibold);
+}
+
+.hours {
+    color: var(--color-text-supporting);
+    font-size: var(--font-size-meta);
+    line-height: 17px;
+}
+
+.footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-card-gap);
+    color: var(--color-text-muted);
+    font-size: var(--font-size-caption);
+    line-height: 15px;
+}
+
+.likes {
+    flex-shrink: 0;
+    gap: var(--spacing-card-gap);
+}
+
+.likeCount,
+.dislikeCount,
+.lastVerifiedAt {
+    white-space: nowrap;
+}
+
+.lastVerifiedAt {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

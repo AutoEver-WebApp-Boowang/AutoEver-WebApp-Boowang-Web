@@ -1,3 +1,85 @@
+:root {
+  /* Color palette */
+  --color-white: #ffffff;
+
+  --color-blue-50: #f7fbff;
+  --color-blue-100: #e6f0fb;
+  --color-blue-200: #cfe4fa;
+  --color-blue-300: #9cc4ec;
+  --color-blue-500: #3f6fa8;
+  --color-blue-600: #2f5581;
+
+  --color-ink-400: #5e7387;
+  --color-ink-500: #4f6680;
+  --color-ink-600: #546a82;
+  --color-ink-700: #40566e;
+  --color-ink-900: #1b2733;
+
+  --color-brown-500: #6b4028;
+  --color-neutral-100: #edf5fc;
+  --color-map-background: #eaf2fb;
+
+  /* Badge colors */
+  --color-badge-public-background: #d9ebd6;
+  --color-badge-public-text: #2f5a3a;
+  --color-badge-user-background: #f3e2ce;
+  --color-badge-user-text: #6b4028;
+  --color-badge-verification-background: #fbe9d2;
+  --color-badge-verification-text: #8a5a2b;
+
+  /* Semantic colors */
+  --color-background-app: var(--color-blue-50);
+  --color-background-panel: var(--color-white);
+  --color-background-selected: var(--color-blue-100);
+  --color-background-neutral: var(--color-neutral-100);
+  --color-border-default: var(--color-blue-200);
+  --color-border-hover: var(--color-blue-300);
+  --color-primary: var(--color-blue-500);
+  --color-primary-hover: var(--color-blue-600);
+  --color-text-primary: var(--color-ink-900);
+  --color-text-secondary: var(--color-ink-700);
+  --color-text-supporting: var(--color-ink-500);
+  --color-text-muted: var(--color-ink-400);
+  --color-text-section: var(--color-ink-600);
+  --color-favorite: var(--color-brown-500);
+
+  /* Typography */
+  --font-family-base: "Pretendard", -apple-system, BlinkMacSystemFont,
+    "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+  --font-size-page-title: 32px;
+  --font-size-detail-title: 18px;
+  --font-size-section-title: 14px;
+  --font-size-card-title: 14px;
+  --font-size-body: 13px;
+  --font-size-meta: 12px;
+  --font-size-caption: 11px;
+  --font-weight-regular: 400;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --letter-spacing-page-title: -0.02em;
+
+  /* Radius */
+  --radius-small: 10px;
+  --radius-medium: 14px;
+  --radius-large: 18px;
+  --radius-nav-chip: 22px;
+  --radius-pill: 24px;
+  --radius-circle: 50%;
+
+  /* Spacing */
+  --spacing-card-row: 6px;
+  --spacing-card-gap: 8px;
+  --spacing-card-padding: 12px;
+  --spacing-panel-padding: 16px;
+  --spacing-detail-padding: 20px;
+  --spacing-map-floating: 24px;
+
+  /* Layout */
+  --layout-nav-rail-width: 72px;
+  --layout-list-panel-width: 380px;
+  --layout-detail-panel-width: 380px;
+}
+
 *,
 *::before,
 *::after {
@@ -8,4 +90,5 @@ html,
 body {
   margin: 0;
   padding: 0;
+  font-family: var(--font-family-base);
 }

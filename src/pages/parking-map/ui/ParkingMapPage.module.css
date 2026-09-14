@@ -1,6 +1,6 @@
 .main {
     display: grid;
-    grid-template-columns: 72px 340px minmax(0, 1fr);
+    grid-template-columns: var(--layout-nav-rail-width) var(--layout-list-panel-width) minmax(0, 1fr);
     width: 100%;
     height: 100dvh; /* 주소창이나 하단 도구 모음이 펼쳐지거나 접히는 상태를 반영한 현재 화면 높이 전체 */
     overflow: hidden;
