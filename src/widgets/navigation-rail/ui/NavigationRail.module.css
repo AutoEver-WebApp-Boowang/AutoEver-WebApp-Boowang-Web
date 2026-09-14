@@ -1,0 +1,45 @@
+.navigationRail {
+    width: 100%;
+    height: 100%;
+    border-right: 1px solid #d9d9d9;
+}
+
+.menuList {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+
+    margin: 0;
+    padding: 24px 0;
+    list-style: none;
+}
+
+.menuItem {
+    width: 100%;
+}
+
+.menuButton {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    min-height: 59px;
+    padding: 8px 4px;
+
+    border: 0;
+    background: transparent;
+    font: inherit;
+    cursor: pointer;
+}
+
+.menuButton[aria-pressed='true'] {
+    background-color: #eef2f6;
+}
+
+.menuButton:focus-visible {
+    outline: 2px solid #333;
+    outline-offset: -2px;
+}
