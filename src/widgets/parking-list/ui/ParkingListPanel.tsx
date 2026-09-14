@@ -1,5 +1,6 @@
 import styles from './ParkingListPanel.module.css'
 import type {FormEvent} from "react";
+import {mockParkingCards, ParkingCard} from "@/entities/parking";
 
 export function ParkingListPanel() {
 
@@ -10,29 +11,27 @@ export function ParkingListPanel() {
     }
     return(
         <section className={styles.panel}>
-            <form
-                className={styles.searchForm}
-                role={"search"}
-                onSubmit={handleSearchSubmit}
-            >
-                <label htmlFor="parking-search">
-                    주차장 검색
-                </label>
-
-                <input
-                    id={"parking-search"} // htmlFor와 연결 label을 클릭해도 해당 요소로 포커스 이동
-                    className={styles.searchInput}
-                    type="search"
-                    name={'query'}
-                    placeholder={'주소, 장소명으로 검색'}
-                />
-                <button type={"submit"}>
-                    검색
-                </button>
-            </form>
-
-
             <header className={styles.listHeader}>
+                <form
+                    className={styles.searchForm}
+                    role={"search"}
+                    onSubmit={handleSearchSubmit}
+                >
+                    <label htmlFor="parking-search">
+                        주차장 검색
+                    </label>
+
+                    <input
+                        id={"parking-search"} // htmlFor와 연결 label을 클릭해도 해당 요소로 포커스 이동
+                        className={styles.searchInput}
+                        type="search"
+                        name={'query'}
+                        placeholder={'주소, 장소명으로 검색'}
+                    />
+                    <button type={"submit"}>
+                        검색
+                    </button>
+                </form>
                 <h2>이런 곳들이 있어요</h2>
                 <label htmlFor="parking-sort">
                     정렬
@@ -51,7 +50,11 @@ export function ParkingListPanel() {
             </header>
 
             <ul className={styles.parkingList}>
-                <li>주차장 카드 영역</li>
+                {mockParkingCards.map((parking) => (
+                    <li>
+                        <ParkingCard parking={parking}/>
+                    </li>
+                ))}
             </ul>
         </section>
     )
