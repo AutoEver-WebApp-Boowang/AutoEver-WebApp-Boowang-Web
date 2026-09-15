@@ -10,10 +10,19 @@
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-large);
     transition: border-color 0.2s ease, background-color 0.2s ease;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+
 }
 
 .Card:hover {
     border-color: var(--color-border-hover);
+}
+
+.selected {
+    background-color: var(--color-background-selected);
+    border-color: var(--color-primary);
 }
 
 .thumbnail {
@@ -24,6 +33,7 @@
     border: 1px solid var(--color-border-default);
     border-radius: var(--radius-medium);
     aspect-ratio: 2 / 1;
+    -webkit-user-drag: none;
 }
 
 .header {

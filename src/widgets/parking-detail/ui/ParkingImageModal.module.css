@@ -1,0 +1,99 @@
+.backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: grid;
+    place-items: center;
+    padding: 40px;
+    background-color: rgb(10 18 26 / 82%);
+}
+
+.modal {
+    position: relative;
+    display: grid;
+    max-width: 100%;
+    max-height: 100%;
+    place-items: center;
+}
+
+.originalImage {
+    display: block;
+    max-width: calc(100vw - 80px);
+    max-height: calc(100vh - 80px);
+    object-fit: contain;
+    border-radius: var(--radius-medium);
+    animation: image-in 180ms ease;
+}
+
+.slideButton {
+    position: fixed;
+    top: 50%;
+    display: grid;
+    width: 48px;
+    height: 48px;
+    place-items: center;
+    padding: 0 0 5px;
+    color: var(--color-white);
+    background-color: rgb(27 39 51 / 72%);
+    border: 1px solid rgb(255 255 255 / 35%);
+    border-radius: var(--radius-circle);
+    font: inherit;
+    font-size: 36px;
+    line-height: 1;
+    transform: translateY(-50%);
+    cursor: pointer;
+}
+
+.slideButton:disabled {
+    opacity: 0.3;
+    cursor: default;
+}
+
+.previous {
+    left: 24px;
+}
+
+.next {
+    right: 24px;
+}
+
+.imageCount {
+    position: absolute;
+    bottom: 16px;
+    left: 50%;
+    padding: 5px 12px;
+    color: var(--color-white);
+    background-color: rgb(27 39 51 / 72%);
+    border-radius: var(--radius-pill);
+    font-size: var(--font-size-meta);
+    transform: translateX(-50%);
+}
+
+.closeButton {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    display: grid;
+    width: 40px;
+    height: 40px;
+    place-items: center;
+    padding: 0 0 3px;
+    color: var(--color-white);
+    background-color: rgb(27 39 51 / 72%);
+    border: 0;
+    border-radius: var(--radius-circle);
+    font: inherit;
+    font-size: 28px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+@keyframes image-in {
+    from {
+        opacity: 0.55;
+    }
+
+    to {
+        opacity: 1;
+    }
+}

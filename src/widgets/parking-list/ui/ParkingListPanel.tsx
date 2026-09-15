@@ -1,11 +1,18 @@
 import styles from './ParkingListPanel.module.css'
 import {useMemo, useState} from "react";
 import type {FormEvent} from "react";
-import {mockParkingCards, ParkingCard} from "@/entities/parking";
+import {mockParkingCards, ParkingCard, type ParkingCardData} from "@/entities/parking";
 
 type SortOption = 'distance' | 'recommended' | 'recent'
+type ParkingListPanelProps = {
+    selectedParking: number | null
+    onParkingSelect: (parking: ParkingCardData) => void
+}
 
-export function ParkingListPanel() {
+export function ParkingListPanel({
+    onParkingSelect,
+    selectedParking
+                                 }:ParkingListPanelProps) {
     const [sortOption, setSortOption] = useState<SortOption>('distance')
 
     const sortedParkingCards = useMemo(() => {
@@ -81,7 +88,7 @@ export function ParkingListPanel() {
             <ul className={styles.parkingList}>
                 {sortedParkingCards.map((parking) => (
                     <li key={parking.id}>
-                        <ParkingCard parking={parking}/>
+                        <ParkingCard parking={parking} isSelected={selectedParking === parking.id} onSelect={onParkingSelect}/>
                     </li>
                 ))}
             </ul>

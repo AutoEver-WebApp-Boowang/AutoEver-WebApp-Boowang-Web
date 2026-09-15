@@ -1,0 +1,1 @@
+export { ParkingDetailPanel } from './ui/ParkingDetailPanel'

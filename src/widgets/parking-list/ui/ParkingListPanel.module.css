@@ -4,6 +4,7 @@
     flex-direction: column;
     height: 100%;
     min-height: 0;
+    overflow: hidden;
     background-color: var(--color-background-panel);
     border-right: 1px solid var(--color-border-default);
 }
@@ -14,7 +15,8 @@
     grid-column: 1 / -1;
     align-items: center;
     height: 64px;
-    padding: 16px;
+    margin: 12px;
+    padding: 8px;
     flex-shrink: 0;
 }
 

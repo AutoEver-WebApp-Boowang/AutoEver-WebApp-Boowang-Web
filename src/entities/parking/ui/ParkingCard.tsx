@@ -1,14 +1,46 @@
-import type { ParkingCardData } from '../model/types'
+import type {ParkingCardData} from '../model/types'
 import styles from './ParkingCard.module.css'
 
 type ParkingCardProps = {
     parking: ParkingCardData
+    isSelected: boolean
+    onSelect: (parking: ParkingCardData) => void
+}
+
+
+const getTimeAgo = (date: string | null) => {
+    if (!date) return '정보 없음'
+
+    const verifiedTime = new Date(date).getTime()
+
+    if (Number.isNaN(verifiedTime)) return '정보 없음'
+
+    const elapsedMinutes = Math.floor((Date.now() - verifiedTime) / (1000 * 60))
+
+    if (elapsedMinutes < 1) return '방금 전'
+    if (elapsedMinutes < 60) return `${elapsedMinutes}분 전`
+
+    const elapsedHours = Math.floor(elapsedMinutes / 60)
+
+    if (elapsedHours < 24) return `${elapsedHours}시간 전`
+
+    const elapsedDays = Math.floor(elapsedHours / 24)
+
+    return `${elapsedDays}일 전`
 }
 
 export function ParkingCard(
-    { parking, }: ParkingCardProps) {
+    {
+        parking,
+        onSelect,
+        isSelected,
+    }: ParkingCardProps) {
     return (
-        <article className={styles.Card}>
+        <button
+            type={"button"}
+            className={`${styles.Card} ${isSelected ? styles.selected : ''}`}
+            onClick={() => onSelect(parking)}
+        >
             <img
                 className={styles.thumbnail}
                 src={parking.thumbnailUrl ?? '/images/default-parking.png'}
@@ -28,7 +60,7 @@ export function ParkingCard(
                 <li>{parking.hasRoof ? '지붕 있음' : '지붕 없음'}</li>
             </ul>
             <ul aria-label={"운영 시간"} className={styles.hours}>
-                <li>{parking.operatingHours ?? '운영시간 모름'}</li>
+                <li>{parking.operatingHours ?? '운영시간 정보 없음'}</li>
             </ul>
             <div className={styles.footer}>
                 <ul className={styles.likes}>
@@ -36,9 +68,9 @@ export function ParkingCard(
                     <li className={styles.dislikeCount}>비추{parking.dislikeCount}</li>
                 </ul>
                 <span className={styles.lastVerifiedAt}>
-                    {parking.lastVerifiedAt ?? '최근 확인 정보 없음'}
+                    최근 확인 {getTimeAgo(parking.lastVerifiedAt)}
                 </span>
             </div>
-        </article>
+        </button>
     )
 }

@@ -7,10 +7,21 @@
 }
 
 .sidePanel {
+    position: relative;
     min-width: 0;
+    min-height: 0;
     height: 100%;
-    overflow: hidden;
-    border-right: solid 1px black;
+    overflow: visible;
+    z-index: 10;
+}
+
+.detailPanel {
+    position: absolute;
+    top: var(--spacing-panel-padding);
+    left: calc(100% + var(--spacing-panel-padding));
+    width: var(--layout-detail-panel-width);
+    height: calc(100% - (var(--spacing-panel-padding) * 2));
+    z-index: 20;
 }
 
 .mapSection {

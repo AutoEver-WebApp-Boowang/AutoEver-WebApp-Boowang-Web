@@ -23,3 +23,26 @@ export type ParkingCardData = {
     dislikeCount: number
     lastVerifiedAt: string | null
 }
+
+export type ParkingDetailData = {
+    id: number
+    name: string
+    address: string
+    type: '공영' | '제보'
+
+    isFree: boolean
+    hasRoof: boolean
+    hasLock: boolean
+
+    operatingHours: string | null
+    capacity: number | null
+    feeDescription: string | null
+    description: string | null
+    infoSource: string
+    imageUrls: string[]
+
+    lastConfirmedAt: string | null
+    recommendCount: number
+    reviewCount: number
+    updatedAt: string
+}
