@@ -1,4 +1,4 @@
-import {useEffect, useRef} from 'react'
+import {useCallback, useEffect, useRef} from 'react'
 import {Map, MapMarker, useKakaoLoader} from 'react-kakao-maps-sdk'
 import styles from './ParkingMap.module.css'
 import type {ParkingCardData} from "@/entities/parking";
@@ -9,6 +9,8 @@ const DEFAULT_CENTER = {
 }
 
 const SEARCH_RESULT_MAP_LEVEL = 4
+
+type FocusStage = 'moving' | 'zooming' | null
 
 export type MapBounds = {
     southWestLatitude: number
@@ -52,26 +54,57 @@ export function ParkingMap({
                                isSearchingBounds,
                            }: ParkingMapProps) {
     const mapRef = useRef<kakao.maps.Map | null>(null)
-    const shouldSearchAfterFocus = useRef(false)
+    const focusStage = useRef<FocusStage>(null)
     const appKey = import.meta.env.VITE_KAKAO_MAP_APP_KEY
     const [loading, error] = useKakaoLoader({
         appkey: appKey,
         libraries: ['services'],
     })
 
+    const searchCurrentBounds = useCallback((
+        map: kakao.maps.Map,
+        preserveSelection = false,
+    ) => {
+        const bounds = map.getBounds()
+        const southWest = bounds.getSouthWest()
+        const northEast = bounds.getNorthEast()
+
+        onSearchBounds({
+            southWestLatitude: southWest.getLat(),
+            southWestLongitude: southWest.getLng(),
+            northEastLatitude: northEast.getLat(),
+            northEastLongitude: northEast.getLng(),
+        }, preserveSelection)
+    }, [onSearchBounds])
+
     useEffect(() => {
         if (!mapRef.current || !focusPosition || !window.kakao?.maps) return
 
-        shouldSearchAfterFocus.current = true
-        mapRef.current.setCenter(
-            new window.kakao.maps.LatLng(
-                focusPosition.lat,
-                focusPosition.lng,
-            ),
-        )
-        mapRef.current.setLevel(SEARCH_RESULT_MAP_LEVEL)
+        const map = mapRef.current
+        const currentCenter = map.getCenter()
+        const isSameCenter =
+            Math.abs(currentCenter.getLat() - focusPosition.lat) < 0.000001 &&
+            Math.abs(currentCenter.getLng() - focusPosition.lng) < 0.000001
+
+        if (isSameCenter) {
+            if (map.getLevel() === SEARCH_RESULT_MAP_LEVEL) {
+                searchCurrentBounds(map, true)
+            } else {
+                focusStage.current = 'zooming'
+                map.setLevel(SEARCH_RESULT_MAP_LEVEL)
+            }
+        } else {
+            focusStage.current = 'moving'
+            map.setCenter(
+                new window.kakao.maps.LatLng(
+                    focusPosition.lat,
+                    focusPosition.lng,
+                ),
+            )
+        }
+
         onFocusApplied()
-    }, [focusPosition, onFocusApplied])
+    }, [focusPosition, onFocusApplied, searchCurrentBounds])
 
     if (!appKey) {
         return <div className={styles.message}>카카오맵 API 키가 없습니다.</div>
@@ -87,22 +120,6 @@ export function ParkingMap({
                 지도를 불러오지 못했습니다. {error.message}
             </div>
         )
-    }
-
-    const searchCurrentBounds = (
-        map: kakao.maps.Map,
-        preserveSelection = false,
-    ) => {
-        const bounds = map.getBounds()
-        const southWest = bounds.getSouthWest()
-        const northEast = bounds.getNorthEast()
-
-        onSearchBounds({
-            southWestLatitude: southWest.getLat(),
-            southWestLongitude: southWest.getLng(),
-            northEastLatitude: northEast.getLat(),
-            northEastLongitude: northEast.getLng(),
-        }, preserveSelection)
     }
 
     const handleSearchCurrentBounds = () => {
@@ -121,9 +138,22 @@ export function ParkingMap({
                     mapRef.current = map
                 }}
                 onIdle={(map) => {
-                    if (!shouldSearchAfterFocus.current) return
+                    if (focusStage.current === 'moving') {
+                        if (map.getLevel() === SEARCH_RESULT_MAP_LEVEL) {
+                            focusStage.current = null
+                            searchCurrentBounds(map, true)
+                            return
+                        }
 
-                    shouldSearchAfterFocus.current = false
+                        focusStage.current = 'zooming'
+                        map.setLevel(SEARCH_RESULT_MAP_LEVEL)
+                        return
+                    }
+
+                    if (focusStage.current !== 'zooming') return
+                    if (map.getLevel() !== SEARCH_RESULT_MAP_LEVEL) return
+
+                    focusStage.current = null
                     searchCurrentBounds(map, true)
                 }}
             >
