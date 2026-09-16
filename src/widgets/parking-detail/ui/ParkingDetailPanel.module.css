@@ -13,6 +13,32 @@
     display: none;
 }
 
+.loadingState {
+    display: flex;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 12px;
+    color: var(--color-text-supporting);
+    font-size: var(--font-size-body);
+}
+
+.loadingSpinner {
+    width: 32px;
+    height: 32px;
+    border: 3px solid var(--color-blue-100);
+    border-top-color: var(--color-primary);
+    border-radius: var(--radius-circle);
+    animation: detail-loading-spin 700ms linear infinite;
+}
+
+@keyframes detail-loading-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
 .summary {
     display: flex;
     flex-direction: column;
@@ -298,5 +324,89 @@
 }
 
 .reviewsContent {
+    position: relative;
     min-height: 300px;
+}
+
+.reviewActions {
+    display: flex;
+    width: 100%;
+    margin-bottom: 14px;
+}
+
+.reviewWriteButton {
+    width: 100%;
+    min-height: 42px;
+    padding: 0 14px;
+    color: var(--color-white);
+    background-color: var(--color-primary);
+    border: 0;
+    border-radius: var(--radius-small);
+    font: inherit;
+    font-size: var(--font-size-body);
+    font-weight: var(--font-weight-bold);
+    cursor: pointer;
+}
+
+.reviewWriteButton:hover {
+    background-color: var(--color-primary-hover);
+}
+
+.reviewWriteButton:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+.reviewFormLayer {
+    position: absolute;
+    z-index: 2;
+    inset: 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 50px;
+    background-color: rgb(255 255 255 / 82%);
+}
+
+.reviewList {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.reviewLoading {
+    display: flex;
+    min-height: 260px;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 12px;
+    color: var(--color-text-supporting);
+    font-size: var(--font-size-body);
+}
+
+.reviewLoadingSpinner {
+    width: 28px;
+    height: 28px;
+    border: 3px solid var(--color-blue-100);
+    border-top-color: var(--color-primary);
+    border-radius: var(--radius-circle);
+    animation: review-loading-spin 700ms linear infinite;
+}
+
+@keyframes review-loading-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.emptyReviews {
+    margin: 0;
+    padding: 40px 0;
+    color: var(--color-text-supporting);
+    font-size: var(--font-size-body);
+    text-align: center;
 }

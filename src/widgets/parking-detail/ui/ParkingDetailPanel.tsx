@@ -1,5 +1,15 @@
 import {useRef, useState} from 'react'
-import {mockParkingDetails} from '@/entities/parking'
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
+import {getParkingDetail, updateParkingFavorite, type ParkingDetailData} from '@/entities/parking'
+import {
+    createReview,
+    getParkingReviews,
+    ReviewCard,
+    updateReviewLike,
+    type ParkingReviewData,
+} from '@/entities/review'
+import {ParkingReactionButtons} from '@/features/parking-reaction'
+import {ReviewForm} from '@/features/review-create'
 import {ParkingImageModal} from './ParkingImageModal'
 import styles from './ParkingDetailPanel.module.css'
 
@@ -26,18 +36,122 @@ const formatDate = (date: string | null) => {
 
 export function ParkingDetailPanel({parkingId, onClose}: ParkingDetailPanelProps) {
     const [activeTab, setActiveTab] = useState<DetailTab>('home')
-    const [isFavorite, setIsFavorite] = useState(false)
     const [currentImageIndex, setCurrentImageIndex] = useState(0)
     const [dragOffset, setDragOffset] = useState(0)
     const [isDragging, setIsDragging] = useState(false)
     const [isImageModalOpen, setIsImageModalOpen] = useState(false)
+    const [isReviewFormOpen, setIsReviewFormOpen] = useState(false)
     const dragStartX = useRef(0)
     const hasDragged = useRef(false)
+    const queryClient = useQueryClient()
 
-    // API 호출 부분 추후 구현
-    const parkingDetail = mockParkingDetails.find(
-        (detail) => detail.id === parkingId
-    )
+    const parkingDetailQuery = useQuery({
+        queryKey: ['parking', 'detail', parkingId],
+        queryFn: ({signal}) => getParkingDetail(parkingId, signal),
+        retry: false,
+    })
+
+    const parkingReviewsQuery = useQuery({
+        queryKey: ['parking', 'reviews', parkingId],
+        queryFn: ({signal}) => getParkingReviews(parkingId, signal),
+        enabled: activeTab === 'reviews',
+        retry: false,
+    })
+
+    const reviewLikeMutation = useMutation({
+        mutationFn: ({reviewId, isCurrentlyLiked}: {
+            reviewId: number
+            isCurrentlyLiked: boolean
+        }) => updateReviewLike(reviewId, isCurrentlyLiked),
+        onSuccess: (result, {reviewId}) => {
+            queryClient.setQueryData<ParkingReviewData[]>(
+                ['parking', 'reviews', parkingId],
+                (currentReviews = []) => currentReviews.map((review) => (
+                    review.id === reviewId
+                        ? {
+                            ...review,
+                            isLiked: result.isLiked,
+                            likeCount: result.likeCount,
+                        }
+                        : review
+                )),
+            )
+        },
+    })
+
+    const createReviewMutation = useMutation({
+        mutationFn: (content: string) => createReview({
+            parkingId,
+            content,
+        }),
+        onSuccess: (newReview) => {
+            queryClient.setQueryData<ParkingReviewData[]>(
+                ['parking', 'reviews', parkingId],
+                (currentReviews = []) => [newReview, ...currentReviews],
+            )
+
+            queryClient.setQueryData<ParkingDetailData>(
+                ['parking', 'detail', parkingId],
+                (currentDetail) => currentDetail
+                    ? {
+                        ...currentDetail,
+                        reviewCount: currentDetail.reviewCount + 1,
+                    }
+                    : currentDetail,
+            )
+        },
+    })
+
+    const favoriteMutation = useMutation({
+        mutationFn: () => updateParkingFavorite(
+            parkingId,
+            parkingDetailQuery.data?.isFavorite ?? false,
+        ),
+        onSuccess: (result) => {
+            queryClient.setQueryData<ParkingDetailData>(
+                ['parking', 'detail', parkingId],
+                (currentDetail) => currentDetail
+                    ? {
+                        ...currentDetail,
+                        isFavorite: result.isFavorite,
+                    }
+                    : currentDetail,
+            )
+
+            void queryClient.invalidateQueries({
+                queryKey: ['parking', 'favorites'],
+            })
+        },
+    })
+
+    const parkingDetail = parkingDetailQuery.data
+    const parkingReviews = parkingReviewsQuery.data ?? []
+    const errorMessage = parkingDetailQuery.error instanceof Error
+        ? parkingDetailQuery.error.message
+        : null
+    const reviewsError = parkingReviewsQuery.error instanceof Error
+        ? parkingReviewsQuery.error.message
+        : null
+
+    const handleReviewLike = (
+        reviewId: number,
+        isCurrentlyLiked: boolean,
+    ) => reviewLikeMutation.mutateAsync({reviewId, isCurrentlyLiked})
+
+    if (parkingDetailQuery.isPending) {
+        return (
+            <aside className={styles.panel}>
+                <div className={styles.loadingState} role="status" aria-live="polite">
+                    <span className={styles.loadingSpinner} aria-hidden="true"/>
+                    <span>상세 정보를 불러오는 중입니다.</span>
+                </div>
+            </aside>
+        )
+    }
+
+    if (errorMessage) {
+        return <aside className={styles.panel}>{errorMessage}</aside>
+    }
 
     if (!parkingDetail) {
         return <aside className={styles.panel}>상세 정보를 찾을 수 없습니다</aside>
@@ -112,11 +226,12 @@ export function ParkingDetailPanel({parkingId, onClose}: ParkingDetailPanelProps
                     <button
                         type="button"
                         className={styles.iconButton}
-                        onClick={() => setIsFavorite((favorite) => !favorite)}
-                        aria-label={isFavorite ? '즐겨찾기에서 삭제' : '즐겨찾기에 추가'}
-                        aria-pressed={isFavorite}
+                        onClick={() => favoriteMutation.mutate()}
+                        disabled={favoriteMutation.isPending}
+                        aria-label={parkingDetail.isFavorite ? '즐겨찾기에서 삭제' : '즐겨찾기에 추가'}
+                        aria-pressed={parkingDetail.isFavorite}
                     >
-                        {isFavorite ? '★' : '☆'}
+                        {parkingDetail.isFavorite ? '★' : '☆'}
                     </button>
                     <button type="button" className={styles.iconButton} onClick={onClose} aria-label="상세 정보 닫기">
                         ×
@@ -243,21 +358,17 @@ export function ParkingDetailPanel({parkingId, onClose}: ParkingDetailPanelProps
                         </div>
                         <div className={styles.informationItem}>
                             <dt>시설 조건</dt>
-                            <dd>
-                                {parkingDetail.hasRoof ? '지붕 있음' : '지붕 없음'}
-                                {' · '}
-                                {parkingDetail.hasLock ? '잠금 있음' : '잠금 없음'}
-                            </dd>
+                            <dd>{parkingDetail.hasRoof ? '지붕 있음' : '지붕 없음'}</dd>
                         </div>
                         <div className={styles.informationItem}>
                             <dt>최근 확인</dt>
                             <dd>{formatDate(parkingDetail.lastConfirmedAt)}</dd>
                         </div>
-                        <div className={styles.informationItem}>
-                            <dt>정보 출처</dt>
-                            <dd>{parkingDetail.infoSource}</dd>
-                        </div>
                     </dl>
+
+                    <ParkingReactionButtons
+                        initialRecommendCount={parkingDetail.recommendCount}
+                    />
 
                     <section className={styles.description} aria-labelledby="parking-description-title">
                         <h3 id="parking-description-title">설명</h3>
@@ -265,7 +376,62 @@ export function ParkingDetailPanel({parkingId, onClose}: ParkingDetailPanelProps
                     </section>
                 </div>
             ) : (
-                <div className={styles.reviewsContent} role="tabpanel" aria-label="리뷰"/>
+                <div className={styles.reviewsContent} role="tabpanel" aria-label="리뷰">
+                    <div className={styles.reviewActions}>
+                        <button
+                            type="button"
+                            className={styles.reviewWriteButton}
+                            onClick={() => setIsReviewFormOpen(true)}
+                        >
+                            리뷰 작성
+                        </button>
+                    </div>
+
+                    {parkingReviewsQuery.isFetching ? (
+                        <div className={styles.reviewLoading} role="status" aria-live="polite">
+                            <span className={styles.reviewLoadingSpinner} aria-hidden="true"/>
+                            <span>리뷰를 불러오는 중입니다.</span>
+                        </div>
+                    ) : reviewsError ? (
+                        <p className={styles.emptyReviews}>
+                            {reviewsError}
+                        </p>
+                    ) : parkingReviews.length > 0 ? (
+                        <ul className={styles.reviewList}>
+                            {parkingReviews.map((review) => (
+                                <li key={review.id}>
+                                    <ReviewCard
+                                        review={review}
+                                        onLike={handleReviewLike}
+                                    />
+                                </li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <p className={styles.emptyReviews}>
+                            아직 등록된 리뷰가 없습니다.
+                        </p>
+                    )}
+
+                    {isReviewFormOpen && (
+                        <div
+                            className={styles.reviewFormLayer}
+                            onMouseDown={(event) => {
+                                if (event.target === event.currentTarget) {
+                                    setIsReviewFormOpen(false)
+                                }
+                            }}
+                        >
+                            <ReviewForm
+                                onSubmit={async (content) => {
+                                    await createReviewMutation.mutateAsync(content)
+                                    setIsReviewFormOpen(false)
+                                }}
+                                onClose={() => setIsReviewFormOpen(false)}
+                            />
+                        </div>
+                    )}
+                </div>
             )}
         </article>
     )

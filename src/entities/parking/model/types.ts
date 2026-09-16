@@ -32,17 +32,20 @@ export type ParkingDetailData = {
 
     isFree: boolean
     hasRoof: boolean
-    hasLock: boolean
 
     operatingHours: string | null
     capacity: number | null
     feeDescription: string | null
     description: string | null
-    infoSource: string
     imageUrls: string[]
 
     lastConfirmedAt: string | null
     recommendCount: number
     reviewCount: number
     updatedAt: string
+    isFavorite: boolean
+}
+
+export type ParkingFavoriteResult = {
+    isFavorite: boolean
 }

@@ -1,0 +1,60 @@
+.card {
+    padding: 16px;
+    background-color: var(--color-background-panel);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-medium);
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.header strong {
+    color: var(--color-text-primary);
+    font-size: var(--font-size-body);
+}
+
+.header time {
+    color: var(--color-text-muted);
+    font-size: var(--font-size-caption);
+}
+
+.content {
+    margin: 12px 0;
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-body);
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+.footer {
+    color: var(--color-text-supporting);
+    font-size: var(--font-size-meta);
+}
+
+.likeButton {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 8px;
+    color: var(--color-text-supporting);
+    background-color: transparent;
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-pill);
+    font: inherit;
+    cursor: pointer;
+}
+
+.liked {
+    color: var(--color-favorite);
+    background-color: var(--color-blue-50);
+    border-color: var(--color-border-hover);
+}
+
+.likeButton:disabled {
+    opacity: 0.6;
+    cursor: default;
+}

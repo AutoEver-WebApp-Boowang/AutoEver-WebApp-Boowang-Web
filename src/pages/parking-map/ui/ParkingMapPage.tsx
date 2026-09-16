@@ -1,21 +1,93 @@
-import {useState} from "react";
-import {type NavigationMenu, NavigationRail} from "@/widgets/navigation-rail";
-import {ParkingListPanel} from "@/widgets/parking-list";
-import {FavoriteListPanel} from "@/widgets/favorite-list";
-import {MyPagePanel} from "@/widgets/my-page-panel";
+import {useCallback, useMemo, useState} from 'react'
+import {useQuery} from '@tanstack/react-query'
+import {type NavigationMenu, NavigationRail} from '@/widgets/navigation-rail'
+import {ParkingListPanel} from '@/widgets/parking-list'
+import {FavoriteListPanel} from '@/widgets/favorite-list'
+import {MyPagePanel} from '@/widgets/my-page-panel'
+import {
+    getFavoriteParkingList,
+    getParkingList,
+    getParkingListByBounds,
+    searchRegisteredParking,
+    type ParkingCardData,
+} from '@/entities/parking'
+import {ParkingDetailPanel} from '@/widgets/parking-detail'
+import {ParkingMap, type MapBounds} from '@/widgets/parking-map'
+import {searchKakaoPlaces, type KakaoPlaceSearchResult} from '@/features/parking-search'
 import styles from './ParkingMapPage.module.css'
-import type {ParkingCardData} from "@/entities/parking";
-import {ParkingDetailPanel} from "@/widgets/parking-detail";
+
+type MapPosition = {
+    lat: number
+    lng: number
+}
+
+type BoundsSearchState = {
+    bounds: MapBounds
+    requestId: number
+}
 
 export function ParkingMapPage() {
     const [activeMenu, setActiveMenu] = useState<NavigationMenu>('parking')
-    // 기본 페이지 주차장 리스트 페이지
     const [selectedParkingId, setSelectedParkingId] = useState<number | null>(null)
+    const [mapFocusPosition, setMapFocusPosition] = useState<MapPosition | null>(null)
+    const [selectedKakaoPlace, setSelectedKakaoPlace] = useState<KakaoPlaceSearchResult | null>(null)
+    const [searchKeyword, setSearchKeyword] = useState('')
+    const [boundsSearch, setBoundsSearch] = useState<BoundsSearchState | null>(null)
+
+    const parkingListQuery = useQuery({
+        queryKey: [
+            'parking',
+            'list',
+            boundsSearch?.bounds ?? null,
+            boundsSearch?.requestId ?? 0,
+        ],
+        queryFn: ({signal}) => {
+            if (boundsSearch) {
+                return getParkingListByBounds(boundsSearch.bounds, signal)
+            }
+
+            return getParkingList(signal)
+        },
+        retry: false,
+    })
+
+    const kakaoSearchQuery = useQuery({
+        queryKey: ['parking', 'search', 'kakao', searchKeyword],
+        queryFn: () => searchKakaoPlaces(searchKeyword),
+        enabled: searchKeyword.length > 0,
+        retry: false,
+        staleTime: 60_000,
+    })
+
+    const registeredSearchQuery = useQuery({
+        queryKey: ['parking', 'search', 'registered', searchKeyword],
+        queryFn: ({signal}) => searchRegisteredParking(searchKeyword, signal),
+        enabled: searchKeyword.length > 0,
+        retry: false,
+        staleTime: 60_000,
+    })
+
+    const favoriteParkingQuery = useQuery({
+        queryKey: ['parking', 'favorites'],
+        queryFn: ({signal}) => getFavoriteParkingList(signal),
+        retry: false,
+    })
+
+    const parkingList = parkingListQuery.data ?? []
+    const favoriteParkingIds = useMemo(
+        () => new Set(
+            (favoriteParkingQuery.data ?? []).map((parking) => parking.id),
+        ),
+        [favoriteParkingQuery.data],
+    )
+    const errorMessage = parkingListQuery.error instanceof Error
+        ? parkingListQuery.error.message
+        : null
 
     const handleMenuChange = (menu: NavigationMenu) => {
         setActiveMenu(menu)
         setSelectedParkingId(null)
-    } // NavigationRail에서 전달받은 타입으로 상태 변경 해당 상태에 따라 표시되는 페널 교체
+    }
 
     const handleParkingSelect = (parking: ParkingCardData) => {
         if (selectedParkingId === parking.id) {
@@ -26,25 +98,94 @@ export function ParkingMapPage() {
         setSelectedParkingId(parking.id)
     }
 
+    const handleParkingSearch = useCallback((keyword: string) => {
+        setSearchKeyword(keyword)
+    }, [])
+
+    const handleSearchResultSelect = (parking: ParkingCardData) => {
+        setSelectedParkingId(parking.id)
+        setSelectedKakaoPlace(null)
+        setMapFocusPosition({
+            lat: parking.latitude,
+            lng: parking.longitude,
+        })
+    }
+
+    const handleKakaoResultSelect = (place: KakaoPlaceSearchResult) => {
+        setSelectedParkingId(null)
+        setSelectedKakaoPlace(place)
+        setMapFocusPosition({
+            lat: place.latitude,
+            lng: place.longitude,
+        })
+    }
+
+    const handleSearchBounds = useCallback((
+        bounds: MapBounds,
+        preserveSelection = false,
+    ) => {
+        if (!preserveSelection) {
+            setSelectedParkingId(null)
+            setSelectedKakaoPlace(null)
+        }
+
+        setBoundsSearch((currentSearch) => ({
+            bounds,
+            requestId: (currentSearch?.requestId ?? 0) + 1,
+        }))
+    }, [])
+
+    const handleMapFocusApplied = useCallback(() => {
+        setMapFocusPosition(null)
+    }, [])
+
     const renderSidePanel = (menu: NavigationMenu) => {
         switch (menu) {
-            case 'parking' :
-                return (<ParkingListPanel
-                    selectedParking={selectedParkingId}
-                    onParkingSelect={handleParkingSelect}
-                />)
+            case 'parking':
+                return (
+                    <ParkingListPanel
+                        parkingList={parkingList}
+                        isLoading={parkingListQuery.isFetching}
+                        errorMessage={errorMessage}
+                        selectedParking={selectedParkingId}
+                        onParkingSelect={handleParkingSelect}
+                        onSearch={handleParkingSearch}
+                        searchResults={registeredSearchQuery.data ?? []}
+                        onSearchResultSelect={handleSearchResultSelect}
+                        kakaoSearchResults={kakaoSearchQuery.data ?? []}
+                        onKakaoResultSelect={handleKakaoResultSelect}
+                        isKakaoSearching={kakaoSearchQuery.isFetching}
+                        kakaoSearchError={kakaoSearchQuery.error instanceof Error
+                            ? kakaoSearchQuery.error.message
+                            : null}
+                        isRegisteredSearching={registeredSearchQuery.isFetching}
+                        registeredSearchError={registeredSearchQuery.error instanceof Error
+                            ? registeredSearchQuery.error.message
+                            : null}
+                    />
+                )
 
-            case 'favorites' :
-                return <FavoriteListPanel/>
+            case 'favorites':
+                return (
+                    <FavoriteListPanel
+                        parkingList={favoriteParkingQuery.data ?? []}
+                        selectedParkingId={selectedParkingId}
+                        isLoading={favoriteParkingQuery.isFetching}
+                        errorMessage={favoriteParkingQuery.error instanceof Error
+                            ? favoriteParkingQuery.error.message
+                            : null}
+                        onParkingSelect={handleParkingSelect}
+                    />
+                )
 
-            case 'myPage' :
+            case 'myPage':
                 return <MyPagePanel/>
 
             default:
                 return null
         }
-
     }
+
     return (
         <main className={styles.main}>
             <NavigationRail
@@ -57,20 +198,37 @@ export function ParkingMapPage() {
 
                 {selectedParkingId !== null && (
                     <div className={styles.detailPanel}>
-                        <ParkingDetailPanel parkingId={selectedParkingId} onClose={() => setSelectedParkingId(null)}/>
+                        <ParkingDetailPanel
+                            key={selectedParkingId}
+                            parkingId={selectedParkingId}
+                            onClose={() => setSelectedParkingId(null)}
+                        />
                     </div>
                 )}
             </aside>
 
-
             <section
                 className={styles.mapSection}
-                aria-label={"주차장 지도"}
+                aria-label="주차장 지도"
             >
-                지도 영역
+                <ParkingMap
+                    parkingList={parkingList}
+                    favoriteParkingIds={favoriteParkingIds}
+                    selectedParkingId={selectedParkingId}
+                    onParkingSelect={handleParkingSelect}
+                    focusPosition={mapFocusPosition}
+                    onFocusApplied={handleMapFocusApplied}
+                    searchedPlace={selectedKakaoPlace
+                        ? {
+                            name: selectedKakaoPlace.name,
+                            lat: selectedKakaoPlace.latitude,
+                            lng: selectedKakaoPlace.longitude,
+                        }
+                        : null}
+                    onSearchBounds={handleSearchBounds}
+                    isSearchingBounds={parkingListQuery.isFetching}
+                />
             </section>
         </main>
     )
-
-
 }
