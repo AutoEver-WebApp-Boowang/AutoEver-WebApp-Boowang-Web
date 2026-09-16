@@ -1,0 +1,11 @@
+/// <reference types="vite/client" />
+
+interface ImportMetaEnv {
+    readonly VITE_API_MODE: 'mock' | 'api'
+    readonly VITE_API_BASE_URL?: string
+    readonly VITE_KAKAO_MAP_APP_KEY: string
+}
+
+interface ImportMeta {
+    readonly env: ImportMetaEnv
+}
