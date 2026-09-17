@@ -1,7 +1,22 @@
 .navigationRail {
     width: 100%;
     height: 100%;
-    border-right: 1px solid #d9d9d9;
+    background-color: var(--color-white);
+    border-right: 1px solid var(--color-border-default);
+}
+
+.logoArea {
+    display: grid;
+    width: 100%;
+    height: 72px;
+    place-items: center;
+}
+
+.logo {
+    display: block;
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
 }
 
 .menuList {
@@ -11,7 +26,7 @@
     gap: 20px;
 
     margin: 0;
-    padding: 24px 0;
+    padding: 8px 0 24px;
     list-style: none;
 }
 
@@ -27,7 +42,8 @@
 
     width: 100%;
     min-height: 59px;
-    padding: 8px 4px;
+    gap: 6px;
+    padding: 0 4px;
 
     border: 0;
     background: transparent;
@@ -35,11 +51,66 @@
     cursor: pointer;
 }
 
-.menuButton[aria-pressed='true'] {
-    background-color: #eef2f6;
+.iconFrame {
+    display: grid;
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;
+    place-items: center;
+}
+
+.menuIcon {
+    display: block;
+    width: 20px;
+    height: 20px;
+    background-color: var(--color-ink-500);
+    -webkit-mask-position: center;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-size: contain;
+    mask-position: center;
+    mask-repeat: no-repeat;
+    mask-size: contain;
+    transition: background-color 150ms ease;
+}
+
+.mapIcon {
+    -webkit-mask-image: url('/icons/nav-map.svg');
+    mask-image: url('/icons/nav-map.svg');
+}
+
+.favoriteIcon {
+    -webkit-mask-image: url('/icons/nav-favorite.svg');
+    mask-image: url('/icons/nav-favorite.svg');
+}
+
+.userIcon {
+    -webkit-mask-image: url('/icons/nav-user.svg');
+    mask-image: url('/icons/nav-user.svg');
+}
+
+.menuLabel {
+    color: var(--color-text-secondary);
+    font-size: 11px;
+    font-weight: var(--font-weight-medium);
+    line-height: 13px;
+    white-space: nowrap;
+}
+
+.menuButton[aria-pressed='true'] .iconFrame {
+    background-color: var(--color-blue-100);
+}
+
+.menuButton[aria-pressed='true'] .menuIcon {
+    background-color: var(--color-primary);
+}
+
+.menuButton[aria-pressed='true'] .menuLabel {
+    color: var(--color-primary);
+    font-weight: var(--font-weight-bold);
 }
 
 .menuButton:focus-visible {
-    outline: 2px solid #333;
+    outline: 2px solid var(--color-primary);
     outline-offset: -2px;
+    border-radius: var(--radius-small);
 }

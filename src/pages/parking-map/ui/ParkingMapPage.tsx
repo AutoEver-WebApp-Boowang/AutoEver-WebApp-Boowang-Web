@@ -181,6 +181,7 @@ export function ParkingMapPage() {
                             ? favoriteParkingQuery.error.message
                             : null}
                         onParkingSelect={handleParkingSelect}
+                        onExplore={() => handleMenuChange('parking')}
                     />
                 )
 

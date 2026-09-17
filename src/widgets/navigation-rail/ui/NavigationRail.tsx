@@ -18,35 +18,61 @@ export function NavigationRail(
             className={styles.navigationRail}
             aria-label="주요 메뉴"
         >
+            <div className={styles.logoArea}>
+                <img
+                    className={styles.logo}
+                    src="/images/boowang-logo.png"
+                    alt="부우왕"
+                />
+            </div>
+
             <ul className={styles.menuList}>
                 <li className={styles.menuItem}>
                     <button
-                        type={"button"}
+                        type="button"
                         aria-pressed={activeMenu === 'parking'}
                         onClick={() =>  onMenuChange('parking')} // 선택된 페이지에 대한 타입 전달
                         className={styles.menuButton}
                     >
-                        지도 홈
+                        <span className={styles.iconFrame}>
+                            <span
+                                className={`${styles.menuIcon} ${styles.mapIcon}`}
+                                aria-hidden="true"
+                            />
+                        </span>
+                        <span className={styles.menuLabel}>지도 홈</span>
                     </button>
                 </li>
-                <li>
+                <li className={styles.menuItem}>
                     <button
-                        type={"button"}
+                        type="button"
                         aria-pressed={activeMenu === 'favorites'}
                         onClick={() => onMenuChange('favorites')}
                         className={styles.menuButton}
                     >
-                        즐겨찾기
+                        <span className={styles.iconFrame}>
+                            <span
+                                className={`${styles.menuIcon} ${styles.favoriteIcon}`}
+                                aria-hidden="true"
+                            />
+                        </span>
+                        <span className={styles.menuLabel}>즐겨찾기</span>
                     </button>
                 </li>
-                <li>
+                <li className={styles.menuItem}>
                     <button
-                        type={"button"}
+                        type="button"
                         aria-pressed={activeMenu === 'myPage'}
                         onClick={() => onMenuChange('myPage')}
                         className={styles.menuButton}
                     >
-                        마이페이지
+                        <span className={styles.iconFrame}>
+                            <span
+                                className={`${styles.menuIcon} ${styles.userIcon}`}
+                                aria-hidden="true"
+                            />
+                        </span>
+                        <span className={styles.menuLabel}>마이페이지</span>
                     </button>
                 </li>
             </ul>
