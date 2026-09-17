@@ -6,7 +6,6 @@ import {FavoriteListPanel} from '@/widgets/favorite-list'
 import {MyPagePanel} from '@/widgets/my-page-panel'
 import {
     getFavoriteParkingList,
-    getParkingList,
     getParkingListByBounds,
     searchRegisteredParking,
     type ParkingCardData,
@@ -15,6 +14,7 @@ import {ParkingDetailPanel} from '@/widgets/parking-detail'
 import {ParkingMap, type MapBounds} from '@/widgets/parking-map'
 import {searchKakaoPlaces, type KakaoPlaceSearchResult} from '@/features/parking-search'
 import styles from './ParkingMapPage.module.css'
+import {useCurrentLocation} from "@/features/current-location";
 
 type MapPosition = {
     lat: number
@@ -34,6 +34,13 @@ export function ParkingMapPage() {
     const [searchKeyword, setSearchKeyword] = useState('')
     const [boundsSearch, setBoundsSearch] = useState<BoundsSearchState | null>(null)
 
+    const {
+        position: currentPosition,
+        errorMessage: currentLocationError,
+        isLocating,
+        startWatching,
+    } = useCurrentLocation()
+
     const parkingListQuery = useQuery({
         queryKey: [
             'parking',
@@ -42,12 +49,11 @@ export function ParkingMapPage() {
             boundsSearch?.requestId ?? 0,
         ],
         queryFn: ({signal}) => {
-            if (boundsSearch) {
-                return getParkingListByBounds(boundsSearch.bounds, signal)
-            }
+            if (!boundsSearch) return Promise.resolve([])
 
-            return getParkingList(signal)
+            return getParkingListByBounds(boundsSearch.bounds, signal)
         },
+        enabled: boundsSearch !== null,
         retry: false,
     })
 
@@ -145,7 +151,7 @@ export function ParkingMapPage() {
                 return (
                     <ParkingListPanel
                         parkingList={parkingList}
-                        isLoading={parkingListQuery.isFetching}
+                        isLoading={boundsSearch === null || parkingListQuery.isFetching}
                         errorMessage={errorMessage}
                         selectedParking={selectedParkingId}
                         onParkingSelect={handleParkingSelect}
@@ -216,6 +222,12 @@ export function ParkingMapPage() {
                     favoriteParkingIds={favoriteParkingIds}
                     selectedParkingId={selectedParkingId}
                     onParkingSelect={handleParkingSelect}
+
+                    currentPosition={currentPosition}
+                    currentLocationError={currentLocationError}
+                    isLocating={isLocating}
+                    onCurrentLocationRequest={startWatching}
+
                     focusPosition={mapFocusPosition}
                     onFocusApplied={handleMapFocusApplied}
                     searchedPlace={selectedKakaoPlace

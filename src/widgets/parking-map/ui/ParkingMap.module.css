@@ -12,17 +12,22 @@
 .searchBoundsButton {
     position: absolute;
     z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
     bottom: 24px;
     left: 50%;
-    padding: 10px 16px;
+    padding: 8px 14px;
     color: var(--color-white);
     background-color: var(--color-primary);
     border: 0;
-    border-radius: var(--radius-pill);
-    box-shadow: 0 4px 12px rgb(27 39 51 / 20%);
+    border-radius: 15px;
+    box-shadow: 0 2px 3px rgb(0 0 0 / 10%);
     font-family: inherit;
-    font-size: var(--font-size-body);
-    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-caption);
+    font-weight: var(--font-weight-bold);
+    line-height: 14px;
     transform: translateX(-50%);
     cursor: pointer;
 }
@@ -32,8 +37,15 @@
 }
 
 .searchBoundsButton:disabled {
-    background-color: var(--color-blue-300);
+    opacity: 0.65;
     cursor: default;
+}
+
+.searchBoundsIcon {
+    display: block;
+    width: 13px;
+    height: 13px;
+    filter: brightness(0) invert(1);
 }
 
 .message {
@@ -44,4 +56,40 @@
     color: var(--color-text-secondary);
     background-color: var(--color-map-background);
     font-size: var(--font-size-body);
+}
+
+
+.currentLocationMarker {
+    display: block;
+    width: 16px;
+    height: 16px;
+
+    background-color: var(--color-primary);
+    border: 3px solid var(--color-white);
+    border-radius: 8px;
+}
+
+.currentLocationControl {
+    position: absolute;
+    z-index: 10;
+    right: 24px;
+    bottom: 24px;
+}
+
+.locationError {
+    position: absolute;
+    right: 0;
+    bottom: 52px;
+
+    width: max-content;
+    max-width: 240px;
+    margin: 0;
+    padding: 8px 12px;
+
+    color: var(--color-text-secondary);
+    background-color: var(--color-white);
+    border-radius: var(--radius-small);
+    box-shadow: 0 2px 4px rgb(0 0 0 / 15%);
+
+    font-size: var(--font-size-meta);
 }
