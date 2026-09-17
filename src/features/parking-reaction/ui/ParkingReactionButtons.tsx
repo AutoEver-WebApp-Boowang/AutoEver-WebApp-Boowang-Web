@@ -54,7 +54,12 @@ export function ParkingReactionButtons({
                 aria-pressed={reaction === 'recommend'}
                 onClick={handleRecommend}
             >
-                <span aria-hidden="true">👍</span>
+                <img
+                    className={styles.reactionIcon}
+                    src="/icons/thumb-up.svg"
+                    alt=""
+                    aria-hidden="true"
+                />
                 추천 {recommendCount}
             </button>
 
@@ -64,7 +69,12 @@ export function ParkingReactionButtons({
                 aria-pressed={reaction === 'notRecommend'}
                 onClick={handleNotRecommend}
             >
-                <span aria-hidden="true">👎</span>
+                <img
+                    className={styles.reactionIcon}
+                    src="/icons/thumb-down.svg"
+                    alt=""
+                    aria-hidden="true"
+                />
                 비추천 {notRecommendCount}
             </button>
         </section>

@@ -59,7 +59,14 @@ export function ReviewCard({review, onLike}: ReviewCardProps) {
                     disabled={isLikeSubmitting}
                     onClick={handleLikeClick}
                 >
-                    <span aria-hidden="true">{isLiked ? '♥' : '♡'}</span>
+                    <img
+                        className={styles.likeIcon}
+                        src={isLiked
+                            ? '/icons/review-like-selected.svg'
+                            : '/icons/review-like.svg'}
+                        alt=""
+                        aria-hidden="true"
+                    />
                     {isLikeSubmitting ? '처리 중...' : `좋아요 ${likeCount}`}
                 </button>
             </footer>

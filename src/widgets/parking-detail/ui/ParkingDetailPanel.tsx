@@ -383,7 +383,13 @@ export function ParkingDetailPanel({parkingId, onClose}: ParkingDetailPanelProps
                             className={styles.reviewWriteButton}
                             onClick={() => setIsReviewFormOpen(true)}
                         >
-                            리뷰 작성
+                            <img
+                                className={styles.reviewWriteIcon}
+                                src="/icons/review-write.svg"
+                                alt=""
+                                aria-hidden="true"
+                            />
+                            리뷰 쓰기
                         </button>
                     </div>
 

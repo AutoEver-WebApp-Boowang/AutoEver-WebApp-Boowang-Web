@@ -48,6 +48,12 @@
     cursor: pointer;
 }
 
+.likeIcon {
+    display: block;
+    width: 13px;
+    height: 13px;
+}
+
 .liked {
     color: var(--color-favorite);
     background-color: var(--color-blue-50);

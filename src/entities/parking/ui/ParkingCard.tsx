@@ -64,8 +64,14 @@ export function ParkingCard(
             </ul>
             <div className={styles.footer}>
                 <ul className={styles.likes}>
-                    <li className={styles.likeCount}>개추{parking.likeCount}</li>
-                    <li className={styles.dislikeCount}>비추{parking.dislikeCount}</li>
+                    <li className={styles.likeCount}>
+                        <img src="/icons/thumb-up.svg" alt="" aria-hidden="true"/>
+                        {parking.likeCount}
+                    </li>
+                    <li className={styles.dislikeCount}>
+                        <img src="/icons/thumb-down.svg" alt="" aria-hidden="true"/>
+                        {parking.dislikeCount}
+                    </li>
                 </ul>
                 <span className={styles.lastVerifiedAt}>
                     최근 확인 {getTimeAgo(parking.lastVerifiedAt)}

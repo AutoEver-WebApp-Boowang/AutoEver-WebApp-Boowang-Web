@@ -116,7 +116,19 @@
 
 .likes {
     flex-shrink: 0;
-    gap: var(--spacing-card-gap);
+    gap: 10px;
+}
+
+.likes li {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.likes img {
+    display: block;
+    width: 13px;
+    height: 13px;
 }
 
 .likeCount,

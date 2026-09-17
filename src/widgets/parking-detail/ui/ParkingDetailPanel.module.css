@@ -335,17 +335,27 @@
 }
 
 .reviewWriteButton {
+    display: flex;
     width: 100%;
-    min-height: 42px;
+    min-height: 38px;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
     padding: 0 14px;
     color: var(--color-white);
     background-color: var(--color-primary);
     border: 0;
-    border-radius: var(--radius-small);
+    border-radius: 19px;
     font: inherit;
     font-size: var(--font-size-body);
     font-weight: var(--font-weight-bold);
     cursor: pointer;
+}
+
+.reviewWriteIcon {
+    display: block;
+    width: 14px;
+    height: 14px;
 }
 
 .reviewWriteButton:hover {
