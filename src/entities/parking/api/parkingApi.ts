@@ -1,11 +1,11 @@
 // 실제 백엔드 API호출
 import {env} from '@/shared/config'
 import type {ParkingCardData, ParkingDetailData, ParkingFavoriteResult} from '../model/types'
+import type {PlaceSummaryResponse} from "@/entities/parking/api/types.ts";
+import {toParkingCardData} from "@/entities/parking/api/parkingMapper.ts";
 
-type ParkingListResponse =
-    | ParkingCardData[]
-    | {
-    data: ParkingCardData[]
+type ParkingListResponse = {
+    places: PlaceSummaryResponse[]
 }
 
 type ParkingDetailResponse =
@@ -35,7 +35,7 @@ export async function getApiParkingList(signal?: AbortSignal): Promise<ParkingCa
 
     const result: ParkingListResponse = await response.json()
 
-    return Array.isArray(result) ? result : result.data
+    return result.places.map(toParkingCardData)
 }
 
 export async function getApiFavoriteParkingList(
@@ -55,7 +55,7 @@ export async function getApiFavoriteParkingList(
 
     const result: ParkingListResponse = await response.json()
 
-    return Array.isArray(result) ? result : result.data
+    return result.places.map(toParkingCardData)
 }
 
 export async function searchApiParkingList(
@@ -74,9 +74,8 @@ export async function searchApiParkingList(
     }
 
     const result: ParkingListResponse = await response.json()
-    const parkingList = Array.isArray(result) ? result : result.data
 
-    return parkingList.slice(0, 5)
+    return result.places.map(toParkingCardData).slice(0, 5)
 }
 
 export async function getApiParkingListByBounds(
@@ -108,7 +107,7 @@ export async function getApiParkingListByBounds(
 
     const result: ParkingListResponse = await response.json()
 
-    return Array.isArray(result) ? result : result.data
+    return result.places.map(toParkingCardData)
 }
 
 export async function getApiParkingDetail(

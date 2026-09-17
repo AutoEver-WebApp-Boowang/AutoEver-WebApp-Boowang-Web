@@ -13,9 +13,7 @@ export type ParkingCardData = {
     source: ParkingSource
 
     isFree: boolean
-    feeDescription: string | null
     operatingHours: string | null
-    capacity: number | null
 
     hasRoof: boolean
 
