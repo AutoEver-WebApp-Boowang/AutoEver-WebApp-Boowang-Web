@@ -90,6 +90,10 @@ export function useCurrentLocation() {
     }, [])
 
     useEffect(() => {
+        startWatching()
+    }, [startWatching])
+
+    useEffect(() => {
         return stopWatching
     }, [stopWatching]);
 

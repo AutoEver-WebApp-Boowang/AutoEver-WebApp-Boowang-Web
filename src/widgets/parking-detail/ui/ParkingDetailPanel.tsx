@@ -12,10 +12,13 @@ import {ParkingReactionButtons} from '@/features/parking-reaction'
 import {ReviewForm} from '@/features/review-create'
 import {ParkingImageModal} from './ParkingImageModal'
 import styles from './ParkingDetailPanel.module.css'
+import {useAppSelector} from "@/app/providers/store/hooks.ts";
 
 type ParkingDetailPanelProps = {
     parkingId: number
+    favoriteParkingIds: Set<number>
     onClose: () => void
+    onRequireLogin: () => void
 }
 
 type DetailTab = 'home' | 'reviews'
@@ -34,7 +37,7 @@ const formatDate = (date: string | null) => {
     }).format(new Date(date))
 }
 
-export function ParkingDetailPanel({parkingId, onClose}: ParkingDetailPanelProps) {
+export function ParkingDetailPanel({parkingId, favoriteParkingIds, onClose, onRequireLogin}: ParkingDetailPanelProps) {
     const [activeTab, setActiveTab] = useState<DetailTab>('home')
     const [currentImageIndex, setCurrentImageIndex] = useState(0)
     const [dragOffset, setDragOffset] = useState(0)
@@ -45,9 +48,15 @@ export function ParkingDetailPanel({parkingId, onClose}: ParkingDetailPanelProps
     const hasDragged = useRef(false)
     const queryClient = useQueryClient()
 
+
+    const accessToken = useAppSelector((state) => state.auth.accessToken)
+    const tokenType = useAppSelector((state) => state.auth.tokenType)
+    const userId = useAppSelector((state) => state.auth.user?.id)
+    const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated)
+
     const parkingDetailQuery = useQuery({
         queryKey: ['parking', 'detail', parkingId],
-        queryFn: ({signal}) => getParkingDetail(parkingId, signal),
+        queryFn: ({signal}) => getParkingDetail(parkingId, favoriteParkingIds.has(parkingId), signal),
         retry: false,
     })
 
@@ -106,6 +115,9 @@ export function ParkingDetailPanel({parkingId, onClose}: ParkingDetailPanelProps
         mutationFn: () => updateParkingFavorite(
             parkingId,
             parkingDetailQuery.data?.isFavorite ?? false,
+            userId!,
+            accessToken!,
+            tokenType!,
         ),
         onSuccess: (result) => {
             queryClient.setQueryData<ParkingDetailData>(
@@ -136,7 +148,14 @@ export function ParkingDetailPanel({parkingId, onClose}: ParkingDetailPanelProps
     const handleReviewLike = (
         reviewId: number,
         isCurrentlyLiked: boolean,
-    ) => reviewLikeMutation.mutateAsync({reviewId, isCurrentlyLiked})
+    ) => {
+        if (!isAuthenticated) {
+            onRequireLogin()
+            return Promise.reject(new Error('로그인이 필요합니다'))
+        }
+
+        return reviewLikeMutation.mutateAsync({reviewId, isCurrentlyLiked})
+    }
 
     if (parkingDetailQuery.isPending) {
         return (
@@ -226,7 +245,13 @@ export function ParkingDetailPanel({parkingId, onClose}: ParkingDetailPanelProps
                     <button
                         type="button"
                         className={styles.iconButton}
-                        onClick={() => favoriteMutation.mutate()}
+                        onClick={() => {
+                            if (!isAuthenticated) {
+                                onRequireLogin()
+                                return
+                            }
+                            favoriteMutation.mutate()
+                        }}
                         disabled={favoriteMutation.isPending}
                         aria-label={parkingDetail.isFavorite ? '즐겨찾기에서 삭제' : '즐겨찾기에 추가'}
                         aria-pressed={parkingDetail.isFavorite}
@@ -368,6 +393,8 @@ export function ParkingDetailPanel({parkingId, onClose}: ParkingDetailPanelProps
 
                     <ParkingReactionButtons
                         initialRecommendCount={parkingDetail.recommendCount}
+                        isAuthenticated={isAuthenticated}
+                        onRequireLogin={onRequireLogin}
                     />
 
                     <section className={styles.description} aria-labelledby="parking-description-title">
@@ -381,7 +408,13 @@ export function ParkingDetailPanel({parkingId, onClose}: ParkingDetailPanelProps
                         <button
                             type="button"
                             className={styles.reviewWriteButton}
-                            onClick={() => setIsReviewFormOpen(true)}
+                            onClick={() => {
+                                if (!isAuthenticated) {
+                                    onRequireLogin()
+                                    return
+                                }
+                                setIsReviewFormOpen(true)
+                            }}
                         >
                             <img
                                 className={styles.reviewWriteIcon}

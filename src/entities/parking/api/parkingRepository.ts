@@ -34,35 +34,41 @@ export function getParkingList(signal?: AbortSignal): Promise<ParkingCardData[]>
 }
 
 export function getFavoriteParkingList(
+    accessToken: string,
+    tokenType: string,
     signal?: AbortSignal,
 ): Promise<ParkingCardData[]> {
     if (env.apiMode === 'mock') {
         return getMockFavoriteParkingList(signal)
     }
 
-    return getApiFavoriteParkingList(signal)
+    return getApiFavoriteParkingList(accessToken, tokenType, signal)
 }
 
 export function getParkingDetail(
     parkingId: number,
+    isFavorite: boolean,
     signal?: AbortSignal,
 ): Promise<ParkingDetailData> {
     if (env.apiMode === 'mock') {
         return getMockParkingDetail(parkingId, signal)
     }
 
-    return getApiParkingDetail(parkingId, signal)
+    return getApiParkingDetail(parkingId, isFavorite, signal)
 }
 
 export function updateParkingFavorite(
     parkingId: number,
     isCurrentlyFavorite: boolean,
+    userId: number,
+    accessToken: string,
+    tokenType: string,
 ): Promise<ParkingFavoriteResult> {
     if (env.apiMode === 'mock') {
         return updateMockParkingFavorite(parkingId, isCurrentlyFavorite)
     }
 
-    return updateApiParkingFavorite(parkingId, isCurrentlyFavorite)
+    return updateApiParkingFavorite(parkingId, isCurrentlyFavorite, userId, accessToken, tokenType)
 }
 
 export function searchRegisteredParking(

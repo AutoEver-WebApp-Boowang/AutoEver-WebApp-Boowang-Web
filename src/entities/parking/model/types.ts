@@ -39,6 +39,7 @@ export type ParkingDetailData = {
 
     lastConfirmedAt: string | null
     recommendCount: number
+    notRecommendCount: number
     reviewCount: number
     updatedAt: string
     isFavorite: boolean

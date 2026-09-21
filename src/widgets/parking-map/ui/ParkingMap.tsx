@@ -40,6 +40,7 @@ type ParkingMapProps = {
         preserveSelection?: boolean,
     ) => void
     isSearchingBounds: boolean
+    showSearchBoundsButton: boolean
 
     currentPosition: CurrentPosition | null
     currentLocationError: string | null
@@ -64,6 +65,7 @@ export function ParkingMap({
                                searchedPlace,
                                onSearchBounds,
                                isSearchingBounds,
+                               showSearchBoundsButton,
                            }: ParkingMapProps) {
     const mapRef = useRef<kakao.maps.Map | null>(null)
     const focusStage = useRef<FocusStage>(null)
@@ -322,21 +324,23 @@ export function ParkingMap({
                 )}
             </div>
 
-            <button
-                type="button"
-                className={styles.searchBoundsButton}
-                onClick={handleSearchCurrentBounds}
-                disabled={isSearchingBounds}
-                aria-busy={isSearchingBounds}
-            >
-                <img
-                    className={styles.searchBoundsIcon}
-                    src="/icons/refresh-map.svg"
-                    alt=""
-                    aria-hidden="true"
-                />
-                {isSearchingBounds ? '검색 중...' : '현재 위치에서 다시 검색'}
-            </button>
+            {showSearchBoundsButton && (
+                <button
+                    type="button"
+                    className={styles.searchBoundsButton}
+                    onClick={handleSearchCurrentBounds}
+                    disabled={isSearchingBounds}
+                    aria-busy={isSearchingBounds}
+                >
+                    <img
+                        className={styles.searchBoundsIcon}
+                        src="/icons/refresh-map.svg"
+                        alt=""
+                        aria-hidden="true"
+                    />
+                    {isSearchingBounds ? '검색 중...' : '현재 위치에서 다시 검색'}
+                </button>
+            )}
         </div>
     )
 }

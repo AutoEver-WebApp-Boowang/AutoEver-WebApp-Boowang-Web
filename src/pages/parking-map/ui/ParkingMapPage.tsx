@@ -15,6 +15,8 @@ import {ParkingMap, type MapBounds} from '@/widgets/parking-map'
 import {searchKakaoPlaces, type KakaoPlaceSearchResult} from '@/features/parking-search'
 import styles from './ParkingMapPage.module.css'
 import {useCurrentLocation} from "@/features/current-location";
+import {useAppSelector} from "@/app/providers/store/hooks.ts";
+import {calculateDistanceMeters} from "@/shared/lib/geo.ts";
 
 type MapPosition = {
     lat: number
@@ -34,6 +36,9 @@ export function ParkingMapPage() {
     const [searchKeyword, setSearchKeyword] = useState('')
     const [boundsSearch, setBoundsSearch] = useState<BoundsSearchState | null>(null)
 
+    const accessToken = useAppSelector((state) => state.auth.accessToken)
+    const tokenType = useAppSelector((state) => state.auth.tokenType)
+    const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated)
     const {
         position: currentPosition,
         errorMessage: currentLocationError,
@@ -75,11 +80,29 @@ export function ParkingMapPage() {
 
     const favoriteParkingQuery = useQuery({
         queryKey: ['parking', 'favorites'],
-        queryFn: ({signal}) => getFavoriteParkingList(signal),
+        queryFn: ({signal}) => getFavoriteParkingList(accessToken!, tokenType!, signal),
+        enabled: accessToken !== null,
         retry: false,
     })
 
     const parkingList = parkingListQuery.data ?? []
+    const mapMarkerList = useMemo(() => {
+        // 즐겨찾기 탭에서는 범위 검색 결과 없이 즐겨찾기된 마커만 보여줌
+        if (activeMenu === 'favorites') {
+            return favoriteParkingQuery.data ?? []
+        }
+
+        const merged = new Map<number, ParkingCardData>()
+
+        for (const parking of parkingList) {
+            merged.set(parking.id, parking)
+        }
+        for (const parking of favoriteParkingQuery.data ?? []) {
+            merged.set(parking.id, parking)
+        }
+
+        return Array.from(merged.values())
+    }, [activeMenu, parkingList, favoriteParkingQuery.data])
     const favoriteParkingIds = useMemo(
         () => new Set(
             (favoriteParkingQuery.data ?? []).map((parking) => parking.id),
@@ -95,6 +118,10 @@ export function ParkingMapPage() {
         setSelectedParkingId(null)
     }
 
+    const handleRequireLogin = () => {
+        handleMenuChange('myPage')
+    }
+
     const handleParkingSelect = (parking: ParkingCardData) => {
         if (selectedParkingId === parking.id) {
             setSelectedParkingId(null)
@@ -102,6 +129,15 @@ export function ParkingMapPage() {
         }
 
         setSelectedParkingId(parking.id)
+    }
+
+    // 지도 마커 클릭 전용: 마이페이지(로그인 화면)에 있다가 마커를 눌렀을 때만
+    // 지도 리스트 탭으로 돌아오도록 처리. 즐겨찾기 탭에서는 그대로 유지.
+    const handleMapMarkerSelect = (parking: ParkingCardData) => {
+        if (activeMenu === 'myPage') {
+            setActiveMenu('parking')
+        }
+        handleParkingSelect(parking)
     }
 
     const handleParkingSearch = useCallback((keyword: string) => {
@@ -130,6 +166,8 @@ export function ParkingMapPage() {
         bounds: MapBounds,
         preserveSelection = false,
     ) => {
+        setActiveMenu((currentMenu) => currentMenu === 'myPage' ? 'parking' : currentMenu)
+
         if (!preserveSelection) {
             setSelectedParkingId(null)
             setSelectedKakaoPlace(null)
@@ -150,7 +188,7 @@ export function ParkingMapPage() {
             case 'parking':
                 return (
                     <ParkingListPanel
-                        parkingList={parkingList}
+                        parkingList={parkingListWithDistance}
                         isLoading={boundsSearch === null || parkingListQuery.isFetching}
                         errorMessage={errorMessage}
                         selectedParking={selectedParkingId}
@@ -174,12 +212,13 @@ export function ParkingMapPage() {
             case 'favorites':
                 return (
                     <FavoriteListPanel
-                        parkingList={favoriteParkingQuery.data ?? []}
+                        parkingList={favoriteListWithDistance}
                         selectedParkingId={selectedParkingId}
                         isLoading={favoriteParkingQuery.isFetching}
                         errorMessage={favoriteParkingQuery.error instanceof Error
                             ? favoriteParkingQuery.error.message
                             : null}
+                        isAuthenticated={isAuthenticated}
                         onParkingSelect={handleParkingSelect}
                         onExplore={() => handleMenuChange('parking')}
                     />
@@ -192,6 +231,27 @@ export function ParkingMapPage() {
                 return null
         }
     }
+
+    const distanceOrigin = selectedKakaoPlace ?? currentPosition
+
+    const parkingListWithDistance = useMemo(() => {
+        if (!distanceOrigin) return parkingList
+
+        return parkingList.map((parking) => ({
+            ...parking,
+            distanceMeters: calculateDistanceMeters(distanceOrigin, parking),
+        }))
+    }, [parkingList, distanceOrigin])
+
+    const favoriteListWithDistance = useMemo(() => {
+        const favorites = favoriteParkingQuery.data ?? []
+        if (!distanceOrigin) return favorites
+
+        return favorites.map((parking) => ({
+            ...parking,
+            distanceMeters: calculateDistanceMeters(distanceOrigin, parking),
+        }))
+    }, [favoriteParkingQuery.data, distanceOrigin])
 
     return (
         <main className={styles.main}>
@@ -208,7 +268,9 @@ export function ParkingMapPage() {
                         <ParkingDetailPanel
                             key={selectedParkingId}
                             parkingId={selectedParkingId}
+                            favoriteParkingIds={favoriteParkingIds}
                             onClose={() => setSelectedParkingId(null)}
+                            onRequireLogin={handleRequireLogin}
                         />
                     </div>
                 )}
@@ -219,10 +281,10 @@ export function ParkingMapPage() {
                 aria-label="주차장 지도"
             >
                 <ParkingMap
-                    parkingList={parkingList}
+                    parkingList={mapMarkerList}
                     favoriteParkingIds={favoriteParkingIds}
                     selectedParkingId={selectedParkingId}
-                    onParkingSelect={handleParkingSelect}
+                    onParkingSelect={handleMapMarkerSelect}
 
                     currentPosition={currentPosition}
                     currentLocationError={currentLocationError}
@@ -240,6 +302,7 @@ export function ParkingMapPage() {
                         : null}
                     onSearchBounds={handleSearchBounds}
                     isSearchingBounds={parkingListQuery.isFetching}
+                    showSearchBoundsButton={activeMenu !== 'favorites'}
                 />
             </section>
         </main>

@@ -1,17 +1,12 @@
 // 실제 백엔드 API호출
 import {env} from '@/shared/config'
 import type {ParkingCardData, ParkingDetailData, ParkingFavoriteResult} from '../model/types'
-import type {PlaceSummaryResponse} from "@/entities/parking/api/types.ts";
-import {toParkingCardData} from "@/entities/parking/api/parkingMapper.ts";
+import type {PlaceDetailResponse, PlaceSummaryResponse} from "@/entities/parking/api/types.ts";
+import {toParkingCardData, toParkingDetailData} from "@/entities/parking/api/parkingMapper.ts";
+import type {ApiResponse} from "@/shared/api";
 
 type ParkingListResponse = {
     places: PlaceSummaryResponse[]
-}
-
-type ParkingDetailResponse =
-    | ParkingDetailData
-    | {
-    data: ParkingDetailData
 }
 
 type ParkingBoundsParams = {
@@ -21,7 +16,9 @@ type ParkingBoundsParams = {
     northEastLongitude: number
 }
 
-export async function getApiParkingList(signal?: AbortSignal): Promise<ParkingCardData[]> {
+export async function getApiParkingList(
+    signal?: AbortSignal
+): Promise<ParkingCardData[]> {
     const response = await fetch(
         `${env.apiBaseUrl}/api/places`,
         {signal},
@@ -38,14 +35,19 @@ export async function getApiParkingList(signal?: AbortSignal): Promise<ParkingCa
     return result.places.map(toParkingCardData)
 }
 
+// 즐겨찾기 주차장 조회
 export async function getApiFavoriteParkingList(
+    accessToken: string,
+    tokenType: string,
     signal?: AbortSignal,
 ): Promise<ParkingCardData[]> {
     const response = await fetch(
-        `${env.apiBaseUrl}/api/favorites`,
+        `${env.apiBaseUrl}/api/v1/users/me/favorites`,
         {
             signal,
-            credentials: 'include',
+            headers: {
+                Authorization: `${tokenType} ${accessToken}`,
+            },
         },
     )
 
@@ -53,9 +55,9 @@ export async function getApiFavoriteParkingList(
         throw new Error(`즐겨찾기 목록 조회 실패: ${response.status}`)
     }
 
-    const result: ParkingListResponse = await response.json()
+    const result: ApiResponse<PlaceSummaryResponse[]> = await response.json()
 
-    return result.places.map(toParkingCardData)
+    return result.data.map(toParkingCardData)
 }
 
 export async function searchApiParkingList(
@@ -88,14 +90,14 @@ export async function getApiParkingListByBounds(
     signal?: AbortSignal,
 ): Promise<ParkingCardData[]> {
     const searchParams = new URLSearchParams({
-        southWestLatitude: String(southWestLatitude),
-        southWestLongitude: String(southWestLongitude),
-        northEastLatitude: String(northEastLatitude),
-        northEastLongitude: String(northEastLongitude),
+        swLat: String(southWestLatitude),
+        swLng: String(southWestLongitude),
+        neLat: String(northEastLatitude),
+        neLng: String(northEastLongitude),
     })
 
     const response = await fetch(
-        `${env.apiBaseUrl}/api/places/bounds?${searchParams}`,
+        `${env.apiBaseUrl}/api/places?${searchParams}`,
         {signal},
     )
 
@@ -110,8 +112,10 @@ export async function getApiParkingListByBounds(
     return result.places.map(toParkingCardData)
 }
 
+// 상세 페이지
 export async function getApiParkingDetail(
     parkingId: number,
+    isFavorite: boolean,
     signal?: AbortSignal,
 ): Promise<ParkingDetailData> {
     const response = await fetch(
@@ -125,20 +129,28 @@ export async function getApiParkingDetail(
         )
     }
 
-    const result: ParkingDetailResponse = await response.json()
+    const result: PlaceDetailResponse = await response.json()
 
-    return 'data' in result ? result.data : result
+    return toParkingDetailData(result, isFavorite)
 }
+
 
 export async function updateApiParkingFavorite(
     parkingId: number,
     isCurrentlyFavorite: boolean,
+    userId: number,
+    accessToken: string,
+    tokenType: string,
 ): Promise<ParkingFavoriteResult> {
+    const searchParams = new URLSearchParams({userId: String(userId)})
+
     const response = await fetch(
-        `${env.apiBaseUrl}/api/favorites/${parkingId}`,
+        `${env.apiBaseUrl}/api/places/${parkingId}/favorites?${searchParams}`,
         {
             method: isCurrentlyFavorite ? 'DELETE' : 'POST',
-            credentials: 'include',
+            headers: {
+                Authorization: `${tokenType} ${accessToken}`,
+            },
         },
     )
 
@@ -146,5 +158,5 @@ export async function updateApiParkingFavorite(
         throw new Error(`즐겨찾기 처리 실패: ${response.status}`)
     }
 
-    return response.json()
+    return {isFavorite: !isCurrentlyFavorite}
 }

@@ -33,6 +33,8 @@ export function ReviewCard({review, onLike}: ReviewCardProps) {
 
             setIsLiked(result.isLiked)
             setLikeCount(result.likeCount)
+        } catch {
+            // 로그인이 필요해서 취소된 경우 등 - 상태 변경 없이 무시
         } finally {
             setIsLikeSubmitting(false)
         }

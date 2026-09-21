@@ -1,4 +1,5 @@
 import {ParkingCard, type ParkingCardData} from '@/entities/parking'
+import {LoginPrompt} from '@/widgets/login-prompt'
 import styles from './FavoriteListPanel.module.css'
 
 type FavoriteListPanelProps = {
@@ -6,6 +7,7 @@ type FavoriteListPanelProps = {
     selectedParkingId: number | null
     isLoading: boolean
     errorMessage: string | null
+    isAuthenticated: boolean
     onParkingSelect: (parking: ParkingCardData) => void
     onExplore: () => void
 }
@@ -15,9 +17,22 @@ export function FavoriteListPanel({
     selectedParkingId,
     isLoading,
     errorMessage,
+    isAuthenticated,
     onParkingSelect,
     onExplore,
 }: FavoriteListPanelProps) {
+    if (!isAuthenticated) {
+        return (
+            <section className={styles.panel}>
+                <header className={styles.header}>
+                    <h2>즐겨찾기</h2>
+                </header>
+
+                <LoginPrompt description="즐겨찾기는 로그인 후 이용할 수 있어요"/>
+            </section>
+        )
+    }
+
     return (
         <section className={styles.panel}>
             <header className={styles.header}>

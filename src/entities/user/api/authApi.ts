@@ -9,7 +9,6 @@ export type AccessTokenResponse = {
 
 export type MeResponse = {
     userId: number
-    sessionId: number
 }
 
 export async function loginTestApi(): Promise<AccessTokenResponse> {
@@ -45,5 +44,22 @@ export async function getMeApi(
     }
 
     const result: ApiResponse<MeResponse> = await response.json()
+    return result.data
+}
+
+export async function refreshAccessTokenApi(): Promise<AccessTokenResponse> {
+    const response = await fetch(
+        `${env.apiBaseUrl}/api/v1/auth/refresh`,
+        {
+            method: 'POST',
+            credentials: 'include',
+        }
+    )
+
+    if (!response.ok) {
+        throw new Error(`토큰 재발급 실패: ${response.status}`)
+    }
+
+    const result: ApiResponse<AccessTokenResponse> = await response.json()
     return result.data
 }

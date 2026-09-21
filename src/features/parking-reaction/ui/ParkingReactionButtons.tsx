@@ -6,17 +6,26 @@ type Reaction = 'recommend' | 'notRecommend' | null
 type ParkingReactionButtonsProps = {
     initialRecommendCount: number
     initialNotRecommendCount?: number
+    isAuthenticated: boolean
+    onRequireLogin: () => void
 }
 
 export function ParkingReactionButtons({
     initialRecommendCount,
     initialNotRecommendCount = 0,
+    isAuthenticated,
+    onRequireLogin,
 }: ParkingReactionButtonsProps) {
     const [reaction, setReaction] = useState<Reaction>(null)
     const [recommendCount, setRecommendCount] = useState(initialRecommendCount)
     const [notRecommendCount, setNotRecommendCount] = useState(initialNotRecommendCount)
 
     const handleRecommend = () => {
+        if (!isAuthenticated) {
+            onRequireLogin()
+            return
+        }
+
         if (reaction === 'recommend') {
             setReaction(null)
             setRecommendCount((count) => Math.max(count - 1, 0))
@@ -32,6 +41,11 @@ export function ParkingReactionButtons({
     }
 
     const handleNotRecommend = () => {
+        if (!isAuthenticated) {
+            onRequireLogin()
+            return
+        }
+
         if (reaction === 'notRecommend') {
             setReaction(null)
             setNotRecommendCount((count) => Math.max(count - 1, 0))

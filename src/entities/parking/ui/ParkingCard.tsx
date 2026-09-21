@@ -1,4 +1,5 @@
 import type {ParkingCardData} from '../model/types'
+import {formatDistanceMeters} from '@/shared/lib/geo'
 import styles from './ParkingCard.module.css'
 
 type ParkingCardProps = {
@@ -49,7 +50,7 @@ export function ParkingCard(
             <div className={styles.header}>
                 <h3 className={styles.name}>{parking.name}</h3>
                 <span className={styles.distanceMeters}>
-                    {parking.distanceMeters !== null ? `${parking.distanceMeters}m` : '거리 정보 없음'}
+                    {parking.distanceMeters !== null ? formatDistanceMeters(parking.distanceMeters) : '거리 정보 없음'}
                 </span>
             </div>
             <ul aria-label={"주차장 속성"} className={styles.attributes}>
