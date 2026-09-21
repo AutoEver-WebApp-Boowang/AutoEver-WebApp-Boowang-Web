@@ -34,3 +34,9 @@ export type PlaceDetailResponse = {
     updatedAt: string
     photos: string[]
 }
+
+export type PlaceUpdateRequest = {
+    feeDescription: string
+    capacity: number
+    hasRoof: boolean
+}

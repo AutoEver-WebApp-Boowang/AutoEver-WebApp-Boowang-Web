@@ -420,3 +420,74 @@
     font-size: var(--font-size-body);
     text-align: center;
 }
+
+.textButton {
+    padding: 0 4px;
+    color: var(--color-text-supporting);
+    background: transparent;
+    border: 0;
+    font-size: var(--font-size-meta);
+    cursor: pointer;
+}
+
+.textButton:hover {
+    color: var(--color-text-primary);
+}
+
+.textButton:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+.editInput {
+    width: 100%;
+    min-height: 32px;
+    padding: 0 10px;
+    color: var(--color-text-primary);
+    background-color: var(--color-background-panel);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-small);
+    font: inherit;
+    font-size: var(--font-size-body);
+}
+
+.editCheckboxLabel {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--color-text-primary);
+    font-size: var(--font-size-body);
+}
+
+.editActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin: -8px 0 20px;
+}
+
+.editCancelButton,
+.editSaveButton {
+    padding: 8px 16px;
+    border-radius: var(--radius-small);
+    font-size: var(--font-size-meta);
+    font-weight: var(--font-weight-bold);
+    cursor: pointer;
+}
+
+.editCancelButton {
+    color: var(--color-text-supporting);
+    background-color: transparent;
+    border: 1px solid var(--color-border-default);
+}
+
+.editSaveButton {
+    color: var(--color-white);
+    background-color: var(--color-primary);
+    border: 0;
+}
+
+.editSaveButton:disabled {
+    opacity: 0.6;
+    cursor: default;
+}

@@ -7,6 +7,8 @@ import {
     getApiParkingList,
     searchApiParkingList,
     updateApiParkingFavorite,
+    updateApiParkingInfo,
+    deleteApiParking,
 } from './parkingApi'
 import {
     getMockFavoriteParkingList,
@@ -15,8 +17,11 @@ import {
     getMockParkingList,
     searchMockParkingList,
     updateMockParkingFavorite,
+    updateMockParkingInfo,
+    deleteMockParkingInfo,
 } from './parkingMockApi'
 import type {ParkingCardData, ParkingDetailData, ParkingFavoriteResult} from '../model/types'
+import type {PlaceUpdateRequest} from './types'
 
 type ParkingBoundsParams = {
     southWestLatitude: number
@@ -91,4 +96,29 @@ export function getParkingListByBounds(
     }
 
     return getApiParkingListByBounds(params, signal)
+}
+
+export function updateParkingInfo(
+    parkingId: number,
+    payload: PlaceUpdateRequest,
+    accessToken: string,
+    tokenType: string,
+): Promise<void> {
+    if (env.apiMode === 'mock') {
+        return updateMockParkingInfo(parkingId, payload)
+    }
+
+    return updateApiParkingInfo(parkingId, payload, accessToken, tokenType)
+}
+
+export function deleteParking(
+    parkingId: number,
+    accessToken: string,
+    tokenType: string,
+): Promise<void> {
+    if (env.apiMode === 'mock') {
+        return deleteMockParkingInfo(parkingId)
+    }
+
+    return deleteApiParking(parkingId, accessToken, tokenType)
 }

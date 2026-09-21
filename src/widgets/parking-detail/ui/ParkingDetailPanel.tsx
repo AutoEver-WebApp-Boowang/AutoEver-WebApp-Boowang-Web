@@ -1,6 +1,12 @@
 import {useRef, useState} from 'react'
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
-import {getParkingDetail, updateParkingFavorite, type ParkingDetailData} from '@/entities/parking'
+import {
+    deleteParking,
+    getParkingDetail,
+    updateParkingFavorite,
+    updateParkingInfo,
+    type ParkingDetailData,
+} from '@/entities/parking'
 import {
     createReview,
     getParkingReviews,
@@ -44,6 +50,10 @@ export function ParkingDetailPanel({parkingId, favoriteParkingIds, onClose, onRe
     const [isDragging, setIsDragging] = useState(false)
     const [isImageModalOpen, setIsImageModalOpen] = useState(false)
     const [isReviewFormOpen, setIsReviewFormOpen] = useState(false)
+    const [isEditMode, setIsEditMode] = useState(false)
+    const [editFeeDescription, setEditFeeDescription] = useState('')
+    const [editCapacity, setEditCapacity] = useState('')
+    const [editHasRoof, setEditHasRoof] = useState(false)
     const dragStartX = useRef(0)
     const hasDragged = useRef(false)
     const queryClient = useQueryClient()
@@ -136,6 +146,47 @@ export function ParkingDetailPanel({parkingId, favoriteParkingIds, onClose, onRe
         },
     })
 
+    const updateInfoMutation = useMutation({
+        mutationFn: () => updateParkingInfo(
+            parkingId,
+            {
+                feeDescription: editFeeDescription,
+                capacity: Number(editCapacity),
+                hasRoof: editHasRoof,
+            },
+            accessToken!,
+            tokenType!,
+        ),
+        onSuccess: () => {
+            queryClient.setQueryData<ParkingDetailData>(
+                ['parking', 'detail', parkingId],
+                (currentDetail) => currentDetail
+                    ? {
+                        ...currentDetail,
+                        feeDescription: editFeeDescription,
+                        capacity: Number(editCapacity),
+                        hasRoof: editHasRoof,
+                    }
+                    : currentDetail,
+            )
+            setIsEditMode(false)
+        },
+        onError: (error) => {
+            window.alert(error instanceof Error ? error.message : '수정에 실패했습니다')
+        },
+    })
+
+    const deleteParkingMutation = useMutation({
+        mutationFn: () => deleteParking(parkingId, accessToken!, tokenType!),
+        onSuccess: () => {
+            void queryClient.invalidateQueries({queryKey: ['parking']})
+            onClose()
+        },
+        onError: (error) => {
+            window.alert(error instanceof Error ? error.message : '삭제에 실패했습니다')
+        },
+    })
+
     const parkingDetail = parkingDetailQuery.data
     const parkingReviews = parkingReviewsQuery.data ?? []
     const errorMessage = parkingDetailQuery.error instanceof Error
@@ -155,6 +206,23 @@ export function ParkingDetailPanel({parkingId, favoriteParkingIds, onClose, onRe
         }
 
         return reviewLikeMutation.mutateAsync({reviewId, isCurrentlyLiked})
+    }
+
+    const handleStartEdit = () => {
+        if (!parkingDetail) return
+
+        setEditFeeDescription(parkingDetail.feeDescription ?? '')
+        setEditCapacity(parkingDetail.capacity !== null ? String(parkingDetail.capacity) : '')
+        setEditHasRoof(parkingDetail.hasRoof)
+        setIsEditMode(true)
+    }
+
+    const handleDeleteParking = () => {
+        const isConfirmed = window.confirm('이 주차장 정보를 삭제할까요? 삭제하면 되돌릴 수 없어요.')
+
+        if (!isConfirmed) return
+
+        deleteParkingMutation.mutate()
     }
 
     if (parkingDetailQuery.isPending) {
@@ -242,6 +310,25 @@ export function ParkingDetailPanel({parkingId, favoriteParkingIds, onClose, onRe
         <article className={styles.panel}>
             <header className={styles.summary}>
                 <div className={styles.actions}>
+                    {isAuthenticated && (
+                        <>
+                            <button
+                                type="button"
+                                className={styles.textButton}
+                                onClick={handleStartEdit}
+                            >
+                                수정
+                            </button>
+                            <button
+                                type="button"
+                                className={styles.textButton}
+                                onClick={handleDeleteParking}
+                                disabled={deleteParkingMutation.isPending}
+                            >
+                                삭제
+                            </button>
+                        </>
+                    )}
                     <button
                         type="button"
                         className={styles.iconButton}
@@ -375,21 +462,79 @@ export function ParkingDetailPanel({parkingId, favoriteParkingIds, onClose, onRe
                         </div>
                         <div className={styles.informationItem}>
                             <dt>이용 요금</dt>
-                            <dd>{parkingDetail.isFree ? '무료' : parkingDetail.feeDescription ?? '요금 정보 없음'}</dd>
+                            {isEditMode ? (
+                                <dd>
+                                    <input
+                                        className={styles.editInput}
+                                        type="text"
+                                        value={editFeeDescription}
+                                        onChange={(event) => setEditFeeDescription(event.target.value)}
+                                        placeholder="예: 시간당 1,000원"
+                                    />
+                                </dd>
+                            ) : (
+                                <dd>{parkingDetail.isFree ? '무료' : parkingDetail.feeDescription ?? '요금 정보 없음'}</dd>
+                            )}
                         </div>
                         <div className={styles.informationItem}>
                             <dt>주차 가능 대수</dt>
-                            <dd>{parkingDetail.capacity !== null ? `${parkingDetail.capacity}대` : '정보 없음'}</dd>
+                            {isEditMode ? (
+                                <dd>
+                                    <input
+                                        className={styles.editInput}
+                                        type="number"
+                                        min={0}
+                                        value={editCapacity}
+                                        onChange={(event) => setEditCapacity(event.target.value)}
+                                        placeholder="예: 15"
+                                    />
+                                </dd>
+                            ) : (
+                                <dd>{parkingDetail.capacity !== null ? `${parkingDetail.capacity}대` : '정보 없음'}</dd>
+                            )}
                         </div>
                         <div className={styles.informationItem}>
                             <dt>시설 조건</dt>
-                            <dd>{parkingDetail.hasRoof ? '지붕 있음' : '지붕 없음'}</dd>
+                            {isEditMode ? (
+                                <dd>
+                                    <label className={styles.editCheckboxLabel}>
+                                        <input
+                                            type="checkbox"
+                                            checked={editHasRoof}
+                                            onChange={(event) => setEditHasRoof(event.target.checked)}
+                                        />
+                                        지붕 있음
+                                    </label>
+                                </dd>
+                            ) : (
+                                <dd>{parkingDetail.hasRoof ? '지붕 있음' : '지붕 없음'}</dd>
+                            )}
                         </div>
                         <div className={styles.informationItem}>
                             <dt>최근 확인</dt>
                             <dd>{formatDate(parkingDetail.lastConfirmedAt)}</dd>
                         </div>
                     </dl>
+
+                    {isEditMode && (
+                        <div className={styles.editActions}>
+                            <button
+                                type="button"
+                                className={styles.editCancelButton}
+                                onClick={() => setIsEditMode(false)}
+                            >
+                                취소
+                            </button>
+                            <button
+                                type="button"
+                                className={styles.editSaveButton}
+                                onClick={() => updateInfoMutation.mutate()}
+                                disabled={updateInfoMutation.isPending}
+                            >
+                                저장
+                            </button>
+                        </div>
+                    )}
 
                     <ParkingReactionButtons
                         initialRecommendCount={parkingDetail.recommendCount}

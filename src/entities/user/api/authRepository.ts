@@ -1,6 +1,6 @@
 import {env} from '@/shared/config'
-import {loginTestApi, getMeApi, refreshAccessTokenApi} from './authApi'
-import {loginMockApi, getMockMeApi, refreshAccessTokenMockApi} from './authMockApi'
+import {loginTestApi, getMeApi, refreshAccessTokenApi, logoutApi} from './authApi'
+import {loginMockApi, getMockMeApi, refreshAccessTokenMockApi, logoutMockApi} from './authMockApi'
 import type {AccessTokenResponse, MeResponse} from './authApi'
 
 export function loginTest(): Promise<AccessTokenResponse> {
@@ -22,4 +22,11 @@ export function refreshAccessToken(): Promise<AccessTokenResponse> {
         return refreshAccessTokenMockApi()
     }
     return refreshAccessTokenApi()
+}
+
+export function logout(): Promise<void> {
+    if (env.apiMode === 'mock') {
+        return logoutMockApi()
+    }
+    return logoutApi()
 }

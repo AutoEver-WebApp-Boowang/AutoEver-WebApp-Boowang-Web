@@ -1,6 +1,7 @@
 import {useQuery} from '@tanstack/react-query'
 import {useAppSelector} from '@/app/providers/store/hooks.ts'
 import {getMyProfile} from '@/entities/user/api/userRepository'
+import {useLogout} from '@/entities/user/model/useLogout'
 import {LoginPrompt} from '@/widgets/login-prompt'
 import styles from './MyPagePanel.module.css'
 
@@ -25,6 +26,8 @@ export function MyPagePanel() {
     const accessToken = useAppSelector((state) => state.auth.accessToken)
     const tokenType = useAppSelector((state) => state.auth.tokenType)
 
+    const logoutMutation = useLogout()
+
     const myProfileQuery = useQuery({
         queryKey: ['user', 'me'],
         queryFn: () => getMyProfile(accessToken!, tokenType!),
@@ -40,6 +43,14 @@ export function MyPagePanel() {
         <section className={styles.panel}>
             <header className={styles.header}>
                 <h2>마이페이지</h2>
+                <button
+                    type="button"
+                    className={styles.logoutButton}
+                    onClick={() => logoutMutation.mutate()}
+                    disabled={logoutMutation.isPending}
+                >
+                    로그아웃
+                </button>
             </header>
 
             {myProfileQuery.isLoading && (

@@ -63,3 +63,17 @@ export async function refreshAccessTokenApi(): Promise<AccessTokenResponse> {
     const result: ApiResponse<AccessTokenResponse> = await response.json()
     return result.data
 }
+
+export async function logoutApi(): Promise<void> {
+    const response = await fetch(
+        `${env.apiBaseUrl}/api/v1/auth/logout`,
+        {
+            method: 'POST',
+            credentials: 'include',
+        }
+    )
+
+    if (!response.ok) {
+        throw new Error(`로그아웃 실패: ${response.status}`)
+    }
+}

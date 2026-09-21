@@ -19,3 +19,7 @@ export async function getMockMeApi(): Promise<MeResponse> {
 export async function refreshAccessTokenMockApi(): Promise<AccessTokenResponse> {
     throw new Error('로그인된 세션이 없습니다')
 }
+
+export async function logoutMockApi(): Promise<void> {
+    return
+}

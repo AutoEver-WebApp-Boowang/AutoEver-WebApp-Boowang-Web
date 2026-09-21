@@ -8,10 +8,13 @@ export type {
     ParkingSource,
 } from './model/types'
 export {
+    deleteParking,
     getFavoriteParkingList,
     getParkingDetail,
     getParkingList,
     getParkingListByBounds,
     searchRegisteredParking,
     updateParkingFavorite,
+    updateParkingInfo,
 } from './api/parkingRepository'
+export type {PlaceUpdateRequest} from './api/types'

@@ -145,3 +145,22 @@
 .feedbackButton:hover {
     opacity: 0.9;
 }
+
+.logoutButton {
+    padding: 6px 12px;
+    color: var(--color-text-supporting);
+    background: none;
+    border: 1px solid var(--color-border-default);
+    border-radius: 14px;
+    font-size: var(--font-size-meta);
+    cursor: pointer;
+}
+
+.logoutButton:hover {
+    background-color: var(--color-background-neutral);
+}
+
+.logoutButton:disabled {
+    opacity: 0.5;
+    cursor: default;
+}

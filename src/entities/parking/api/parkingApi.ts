@@ -1,7 +1,7 @@
 // 실제 백엔드 API호출
 import {env} from '@/shared/config'
 import type {ParkingCardData, ParkingDetailData, ParkingFavoriteResult} from '../model/types'
-import type {PlaceDetailResponse, PlaceSummaryResponse} from "@/entities/parking/api/types.ts";
+import type {PlaceDetailResponse, PlaceSummaryResponse, PlaceUpdateRequest} from "@/entities/parking/api/types.ts";
 import {toParkingCardData, toParkingDetailData} from "@/entities/parking/api/parkingMapper.ts";
 import type {ApiResponse} from "@/shared/api";
 
@@ -159,4 +159,57 @@ export async function updateApiParkingFavorite(
     }
 
     return {isFavorite: !isCurrentlyFavorite}
+}
+
+// 장소 정보 수정 (등록자만 가능 - 등록자 아니면 백엔드가 403 반환)
+export async function updateApiParkingInfo(
+    parkingId: number,
+    payload: PlaceUpdateRequest,
+    accessToken: string,
+    tokenType: string,
+): Promise<void> {
+    const response = await fetch(
+        `${env.apiBaseUrl}/api/places/${parkingId}`,
+        {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `${tokenType} ${accessToken}`,
+            },
+            body: JSON.stringify(payload),
+        },
+    )
+
+    if (response.status === 403) {
+        throw new Error('수정 권한이 없습니다')
+    }
+
+    if (!response.ok) {
+        throw new Error(`주차장 정보 수정 실패: ${response.status}`)
+    }
+}
+
+// 장소 삭제 (등록자만 가능 - 등록자 아니면 백엔드가 403 반환)
+export async function deleteApiParking(
+    parkingId: number,
+    accessToken: string,
+    tokenType: string,
+): Promise<void> {
+    const response = await fetch(
+        `${env.apiBaseUrl}/api/places/${parkingId}`,
+        {
+            method: 'DELETE',
+            headers: {
+                Authorization: `${tokenType} ${accessToken}`,
+            },
+        },
+    )
+
+    if (response.status === 403) {
+        throw new Error('삭제 권한이 없습니다')
+    }
+
+    if (!response.ok) {
+        throw new Error(`주차장 삭제 실패: ${response.status}`)
+    }
 }

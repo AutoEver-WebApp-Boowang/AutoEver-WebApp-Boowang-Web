@@ -2,6 +2,7 @@
 import {mockParkingCards} from '../model/mock'
 import {mockParkingDetails} from '../model/mockDetail'
 import type {ParkingCardData, ParkingDetailData, ParkingFavoriteResult} from '../model/types'
+import type {PlaceUpdateRequest} from './types'
 
 const mockFavoriteParkingIds = new Set<number>()
 
@@ -120,5 +121,28 @@ export async function updateMockParkingFavorite(
 
     return {
         isFavorite: !isCurrentlyFavorite,
+    }
+}
+
+export async function updateMockParkingInfo(
+    parkingId: number,
+    payload: PlaceUpdateRequest,
+): Promise<void> {
+    const parkingDetail = mockParkingDetails.find((detail) => detail.id === parkingId)
+
+    if (!parkingDetail) {
+        throw new Error('주차장 상세 정보를 찾을 수 없습니다.')
+    }
+
+    parkingDetail.feeDescription = payload.feeDescription
+    parkingDetail.capacity = payload.capacity
+    parkingDetail.hasRoof = payload.hasRoof
+}
+
+export async function deleteMockParkingInfo(parkingId: number): Promise<void> {
+    const detailIndex = mockParkingDetails.findIndex((detail) => detail.id === parkingId)
+
+    if (detailIndex !== -1) {
+        mockParkingDetails.splice(detailIndex, 1)
     }
 }
