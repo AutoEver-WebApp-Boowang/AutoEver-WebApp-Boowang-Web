@@ -148,6 +148,7 @@ export function ParkingMap({
                 currentPosition.longitude,
             ),
         )
+        mapRef.current.setLevel(4)
 
         setShouldMoveToCurrentPosition(false)
     }, [
@@ -210,6 +211,7 @@ export function ParkingMap({
                 currentPosition.longitude,
             ),
         )
+        mapRef.current.setLevel(4)
     }
 
     return (
