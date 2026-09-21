@@ -104,21 +104,6 @@
     font-weight: var(--font-weight-bold);
 }
 
-.mapPreview {
-    display: grid;
-    place-items: center;
-    height: 116px;
-
-    background-color: var(--color-map-background);
-    border-radius: var(--radius-medium);
-}
-
-.mapPreviewPin {
-    display: block;
-    width: 30px;
-    height: 38px;
-}
-
 .addressRow {
     display: flex;
     align-items: center;

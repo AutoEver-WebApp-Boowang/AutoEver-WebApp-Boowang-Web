@@ -199,14 +199,6 @@ export function ParkingRegisterModal({
                 <div className={styles.body}>
                     <section className={styles.field}>
                         <p className={styles.label}>위치</p>
-                        <div className={styles.mapPreview}>
-                            <img
-                                className={styles.mapPreviewPin}
-                                src="/icons/parking-marker-default.svg"
-                                alt=""
-                                aria-hidden="true"
-                            />
-                        </div>
                         <div className={styles.addressRow}>
                             <span className={styles.addressText}>
                                 {isGeocoding
