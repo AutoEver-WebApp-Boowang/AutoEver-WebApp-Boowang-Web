@@ -6,7 +6,7 @@ import type {CurrentPosition} from '@/features/current-location'
 import {getAddressFromCoordinate} from '../lib/getAddressFromCoordinate'
 import styles from './ParkingRegisterModal.module.css'
 
-const MAX_PHOTO_COUNT = 3
+const MAX_PHOTO_COUNT = 5
 const PLACE_TYPE = '제보' as const
 
 type ParkingRegisterModalProps = {
