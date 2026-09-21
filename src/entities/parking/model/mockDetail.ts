@@ -25,6 +25,7 @@ export const mockParkingDetails: ParkingDetailData[] = [
         reviewCount: 8,
         updatedAt: '2026-09-12T10:30:00',
         isFavorite: false,
+        myReaction: null,
     },
     {
         id: 2,
@@ -44,6 +45,7 @@ export const mockParkingDetails: ParkingDetailData[] = [
         reviewCount: 3,
         updatedAt: '2026-09-14T07:00:00',
         isFavorite: false,
+        myReaction: null,
     },
     {
         id: 3,
@@ -63,6 +65,7 @@ export const mockParkingDetails: ParkingDetailData[] = [
         reviewCount: 14,
         updatedAt: '2026-09-13T14:20:00',
         isFavorite: false,
+        myReaction: null,
     },
     {
         id: 4,
@@ -82,6 +85,7 @@ export const mockParkingDetails: ParkingDetailData[] = [
         reviewCount: 5,
         updatedAt: '2026-09-11T18:10:00',
         isFavorite: false,
+        myReaction: null,
     },
     {
         id: 5,
@@ -101,5 +105,6 @@ export const mockParkingDetails: ParkingDetailData[] = [
         reviewCount: 9,
         updatedAt: '2026-09-14T06:30:00',
         isFavorite: false,
+        myReaction: null,
     },
 ]

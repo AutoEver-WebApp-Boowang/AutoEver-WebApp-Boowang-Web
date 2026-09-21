@@ -5,6 +5,7 @@ import styles from './ParkingReactionButtons.module.css'
 
 type ParkingReactionButtonsProps = {
     parkingId: number
+    initialReaction: ParkingReactionType
     initialRecommendCount: number
     initialNotRecommendCount?: number
     isAuthenticated: boolean
@@ -15,6 +16,7 @@ type ParkingReactionButtonsProps = {
 
 export function ParkingReactionButtons({
     parkingId,
+    initialReaction,
     initialRecommendCount,
     initialNotRecommendCount = 0,
     isAuthenticated,
@@ -22,12 +24,10 @@ export function ParkingReactionButtons({
     tokenType,
     onRequireLogin,
 }: ParkingReactionButtonsProps) {
-    const [reaction, setReaction] = useState<ParkingReactionType>(null)
+    const [reaction, setReaction] = useState<ParkingReactionType>(initialReaction)
     const [recommendCount, setRecommendCount] = useState(initialRecommendCount)
     const [notRecommendCount, setNotRecommendCount] = useState(initialNotRecommendCount)
 
-    // 백엔드가 "내가 이전에 누른 반응"을 알려주는 필드를 아직 안 내려줘서,
-    // 화면상의 선택 상태(reaction)는 새로고침하면 초기화됨. 카운트/저장 자체는 정상적으로 서버에 반영됨.
     const reactionMutation = useMutation({
         mutationFn: (nextReaction: ParkingReactionType) => updateParkingReaction(
             parkingId,

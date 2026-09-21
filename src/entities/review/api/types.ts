@@ -4,6 +4,7 @@ export type ReviewResponse = {
     likeCount: number
     createdAt: string
     nickname: string
+    like: boolean
 }
 
 export type ReviewListResponse = {

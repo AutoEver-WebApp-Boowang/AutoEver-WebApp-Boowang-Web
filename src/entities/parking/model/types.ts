@@ -22,6 +22,8 @@ export type ParkingCardData = {
     lastVerifiedAt: string | null
 }
 
+export type ParkingReactionType = 'recommend' | 'notRecommend' | null
+
 export type ParkingDetailData = {
     id: number
     name: string
@@ -43,6 +45,7 @@ export type ParkingDetailData = {
     reviewCount: number
     updatedAt: string
     isFavorite: boolean
+    myReaction: ParkingReactionType
 }
 
 export type ParkingFavoriteResult = {

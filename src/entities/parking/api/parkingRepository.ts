@@ -24,7 +24,7 @@ import {
     postMockParkingReaction,
     deleteMockParkingReaction,
 } from './parkingMockApi'
-import type {ParkingCardData, ParkingDetailData, ParkingFavoriteResult} from '../model/types'
+import type {ParkingCardData, ParkingDetailData, ParkingFavoriteResult, ParkingReactionType} from '../model/types'
 import type {PlaceUpdateRequest} from './types'
 
 type ParkingBoundsParams = {
@@ -126,8 +126,6 @@ export function deleteParking(
 
     return deleteApiParking(parkingId, accessToken, tokenType)
 }
-
-export type ParkingReactionType = 'recommend' | 'notRecommend' | null
 
 export function updateParkingReaction(
     parkingId: number,

@@ -1,5 +1,5 @@
 import type {PlaceDetailResponse, PlaceSummaryResponse} from "@/entities/parking/api/types.ts";
-import type {ParkingCardData, ParkingDetailData, ParkingSource} from "@/entities/parking";
+import type {ParkingCardData, ParkingDetailData, ParkingReactionType, ParkingSource} from "@/entities/parking";
 
 export function toParkingCardData(place: PlaceSummaryResponse): ParkingCardData {
     return {
@@ -34,6 +34,12 @@ function toParkingDetailType(type: string): '공영' | '제보' {
     return '제보'
 }
 
+function toParkingReactionType(myReaction: string | null): ParkingReactionType {
+    if (myReaction === '추천') return 'recommend'
+    if (myReaction === '비추천') return 'notRecommend'
+    return null
+}
+
 export function toParkingDetailData(
     place: PlaceDetailResponse,
     isFavorite: boolean,
@@ -56,5 +62,6 @@ export function toParkingDetailData(
         reviewCount: place.reviewCount,
         updatedAt: place.updatedAt,
         isFavorite,
+        myReaction: toParkingReactionType(place.myReaction),
     }
 }

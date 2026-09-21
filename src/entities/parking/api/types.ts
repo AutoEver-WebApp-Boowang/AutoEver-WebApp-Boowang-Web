@@ -33,6 +33,7 @@ export type PlaceDetailResponse = {
     reviewCount: number
     updatedAt: string
     photos: string[]
+    myReaction: string | null
 }
 
 export type PlaceUpdateRequest = {

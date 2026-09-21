@@ -5,6 +5,7 @@ export type {
     ParkingCardData,
     ParkingDetailData,
     ParkingFavoriteResult,
+    ParkingReactionType,
     ParkingSource,
 } from './model/types'
 export {
@@ -18,5 +19,4 @@ export {
     updateParkingInfo,
     updateParkingReaction,
 } from './api/parkingRepository'
-export type {ParkingReactionType} from './api/parkingRepository'
 export type {PlaceUpdateRequest} from './api/types'
