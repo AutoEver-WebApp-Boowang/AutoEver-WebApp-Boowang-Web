@@ -55,6 +55,7 @@ export type ParkingFavoriteResult = {
 export type ParkingRegisterInput = {
     name: string
     address: string
+    detailAddress: string | null
     latitude: number
     longitude: number
     type: '공영' | '제보'

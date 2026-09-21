@@ -49,6 +49,7 @@ export type PlaceReactionRequest = {
 export type PlaceRegisterRequest = {
     name: string
     address: string
+    detailAddress?: string
     latitude: number
     longitude: number
     type: string

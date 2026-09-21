@@ -69,6 +69,7 @@ export function toPlaceRegisterRequest(input: ParkingRegisterInput): PlaceRegist
     return {
         name: input.name,
         address: input.address,
+        detailAddress: input.detailAddress ?? undefined,
         latitude: input.latitude,
         longitude: input.longitude,
         type: input.type,

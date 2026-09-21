@@ -35,6 +35,7 @@ export function ParkingRegisterModal({
     const [geocodeError, setGeocodeError] = useState<string | null>(null)
 
     const [name, setName] = useState('')
+    const [detailAddress, setDetailAddress] = useState('')
     const [isFree, setIsFree] = useState(true)
     const [feeDescription, setFeeDescription] = useState('')
     const [operatingHours, setOperatingHours] = useState('')
@@ -127,6 +128,7 @@ export function ParkingRegisterModal({
                 {
                     name: name.trim(),
                     address,
+                    detailAddress: detailAddress.trim() || null,
                     latitude: currentPosition.latitude,
                     longitude: currentPosition.longitude,
                     type: PLACE_TYPE,
@@ -219,6 +221,13 @@ export function ParkingRegisterModal({
                         {currentLocationError && (
                             <p className={styles.locationErrorText}>{currentLocationError}</p>
                         )}
+                        <input
+                            className={styles.textInput}
+                            value={detailAddress}
+                            onChange={(event) => setDetailAddress(event.target.value)}
+                            placeholder="상세 주소 (선택) 예) 지하 1층, 화단 옆"
+                            maxLength={60}
+                        />
                     </section>
 
                     <section className={styles.field}>
