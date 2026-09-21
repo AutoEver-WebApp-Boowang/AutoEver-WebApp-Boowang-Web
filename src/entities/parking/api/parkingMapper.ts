@@ -21,8 +21,8 @@ export function toParkingCardData(place: PlaceSummaryResponse): ParkingCardData 
 }
 
 function toParkingSource(type: string): ParkingSource {
-    if (type === '공영') return 'public'
-    if (type === '제보') return 'user'
+    if (type === 'PUBLIC') return 'public'
+    if (type === 'USER') return 'user'
     throw new Error(`알 수 없는 주차장 타입: ${type}`)
 }
 
