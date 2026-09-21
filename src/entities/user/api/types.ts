@@ -9,3 +9,8 @@ export type UserProfileResponse = {
     trustScore: number
     trustLevel: TrustLevelResponse
 }
+
+export type UserUpdateRequest = {
+    nickname?: string
+    phone?: string
+}

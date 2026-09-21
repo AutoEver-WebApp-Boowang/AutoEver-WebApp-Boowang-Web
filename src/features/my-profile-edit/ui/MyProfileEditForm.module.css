@@ -1,0 +1,105 @@
+.form {
+    display: flex;
+    width: calc(100% - 32px);
+    max-width: 310px;
+    flex-direction: column;
+    gap: 14px;
+    padding: 16px;
+    background-color: var(--color-white);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-medium);
+    box-shadow: 0 8px 24px rgb(27 39 51 / 18%);
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.header h3 {
+    margin: 0;
+    font-size: var(--font-size-section-title);
+    font-weight: var(--font-weight-bold);
+}
+
+.closeButton {
+    display: grid;
+    width: 28px;
+    height: 28px;
+    place-items: center;
+    padding: 0;
+    color: var(--color-text-primary);
+    background: transparent;
+    border: 0;
+    font: inherit;
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.fieldLabel {
+    color: var(--color-text-secondary);
+    font-size: var(--font-size-meta);
+}
+
+.textInput {
+    padding: 10px 12px;
+    color: var(--color-text-primary);
+    background-color: var(--color-white);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-small);
+    font: inherit;
+    box-sizing: border-box;
+}
+
+.textInput:focus {
+    border-color: var(--color-primary);
+    outline: none;
+}
+
+.fieldError {
+    margin: 0;
+    color: var(--color-danger, #e53e3e);
+    font-size: var(--font-size-caption);
+}
+
+.hint {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: var(--font-size-caption);
+}
+
+.footer {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.footer button {
+    min-height: 36px;
+    padding: 0 14px;
+    color: var(--color-white);
+    background-color: var(--color-primary);
+    border: 0;
+    border-radius: var(--radius-small);
+    font: inherit;
+    font-weight: var(--font-weight-bold);
+    cursor: pointer;
+}
+
+.footer button:focus-visible,
+.closeButton:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+.footer button:disabled {
+    opacity: 0.5;
+    cursor: default;
+}

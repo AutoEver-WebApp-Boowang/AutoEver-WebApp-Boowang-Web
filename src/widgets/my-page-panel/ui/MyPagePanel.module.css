@@ -1,4 +1,5 @@
 .panel {
+    position: relative;
     display: flex;
     height: 100%;
     flex-direction: column;
@@ -41,11 +42,31 @@
     border-radius: 40px;
 }
 
+.nicknameRow {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
 .nickname {
     margin: 0;
     color: var(--color-text-primary);
     font-size: var(--font-size-detail-title);
     font-weight: var(--font-weight-bold);
+}
+
+.editProfileButton {
+    padding: 3px 8px;
+    color: var(--color-text-supporting);
+    background-color: var(--color-background-neutral);
+    border: 0;
+    border-radius: 10px;
+    font-size: var(--font-size-caption);
+    cursor: pointer;
+}
+
+.editProfileButton:hover {
+    background-color: var(--color-border-default);
 }
 
 .trustBadgeRow {
@@ -188,4 +209,15 @@
 .withdrawButton:disabled {
     opacity: 0.5;
     cursor: default;
+}
+
+.profileEditLayer {
+    position: absolute;
+    z-index: 2;
+    inset: 0;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 60px;
+    background-color: rgb(255 255 255 / 82%);
 }

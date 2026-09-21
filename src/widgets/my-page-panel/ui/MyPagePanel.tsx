@@ -1,8 +1,11 @@
+import {useState} from 'react'
 import {useQuery} from '@tanstack/react-query'
 import {useAppSelector} from '@/app/providers/store/hooks.ts'
 import {getMyProfile} from '@/entities/user/api/userRepository'
 import {useLogout} from '@/entities/user/model/useLogout'
 import {useWithdraw} from '@/entities/user/model/useWithdraw'
+import {useUpdateMyProfile} from '@/entities/user/model/useUpdateMyProfile'
+import {MyProfileEditForm} from '@/features/my-profile-edit'
 import {LoginPrompt} from '@/widgets/login-prompt'
 import styles from './MyPagePanel.module.css'
 
@@ -45,6 +48,8 @@ export function MyPagePanel() {
 
     const logoutMutation = useLogout()
     const withdrawMutation = useWithdraw()
+    const updateMyProfileMutation = useUpdateMyProfile()
+    const [isProfileEditOpen, setIsProfileEditOpen] = useState(false)
 
     const handleWithdraw = () => {
         const confirmed = window.confirm('정말 탈퇴하시겠어요? 탈퇴하면 계정 정보를 되돌릴 수 없어요.')
@@ -94,7 +99,16 @@ export function MyPagePanel() {
                 <>
                     <div className={styles.profileSection}>
                         <div className={styles.avatar}/>
-                        <p className={styles.nickname}>{myProfileQuery.data.nickname}</p>
+                        <div className={styles.nicknameRow}>
+                            <p className={styles.nickname}>{myProfileQuery.data.nickname}</p>
+                            <button
+                                type="button"
+                                className={styles.editProfileButton}
+                                onClick={() => setIsProfileEditOpen(true)}
+                            >
+                                수정
+                            </button>
+                        </div>
                         <div className={styles.trustBadgeRow}>
                             <span className={styles.trustBadge}>
                                 {myProfileQuery.data.trustLevel.displayName}
@@ -155,6 +169,31 @@ export function MyPagePanel() {
                             회원 탈퇴
                         </button>
                     </div>
+
+                    {isProfileEditOpen && (
+                        <div
+                            className={styles.profileEditLayer}
+                            onMouseDown={(event) => {
+                                if (event.target === event.currentTarget) {
+                                    setIsProfileEditOpen(false)
+                                }
+                            }}
+                        >
+                            <MyProfileEditForm
+                                initialNickname={myProfileQuery.data.nickname}
+                                initialPhone={myProfileQuery.data.phone}
+                                onSubmit={async (payload) => {
+                                    try {
+                                        await updateMyProfileMutation.mutateAsync(payload)
+                                        setIsProfileEditOpen(false)
+                                    } catch (error) {
+                                        window.alert(error instanceof Error ? error.message : '프로필 수정에 실패했어요. 다시 시도해주세요.')
+                                    }
+                                }}
+                                onClose={() => setIsProfileEditOpen(false)}
+                            />
+                        </div>
+                    )}
                 </>
             )}
         </section>
