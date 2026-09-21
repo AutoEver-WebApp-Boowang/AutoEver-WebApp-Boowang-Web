@@ -17,8 +17,8 @@ export function MyProfileEditForm({
                                        onSubmit,
                                        onClose,
                                    }: MyProfileEditFormProps) {
-    const [nickname, setNickname] = useState(initialNickname)
-    const [phone, setPhone] = useState(initialPhone)
+    const [nickname, setNickname] = useState(initialNickname ?? '')
+    const [phone, setPhone] = useState(initialPhone ?? '')
     const [isSubmitting, setIsSubmitting] = useState(false)
 
     const trimmedNickname = nickname.trim()
