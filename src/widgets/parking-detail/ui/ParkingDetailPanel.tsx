@@ -50,6 +50,7 @@ export function ParkingDetailPanel({parkingId, favoriteParkingIds, onClose, onRe
     const [isDragging, setIsDragging] = useState(false)
     const [isImageModalOpen, setIsImageModalOpen] = useState(false)
     const [isReviewFormOpen, setIsReviewFormOpen] = useState(false)
+    const [isMenuOpen, setIsMenuOpen] = useState(false)
     const [isEditMode, setIsEditMode] = useState(false)
     const [editFeeDescription, setEditFeeDescription] = useState('')
     const [editCapacity, setEditCapacity] = useState('')
@@ -215,9 +216,12 @@ export function ParkingDetailPanel({parkingId, favoriteParkingIds, onClose, onRe
         setEditCapacity(parkingDetail.capacity !== null ? String(parkingDetail.capacity) : '')
         setEditHasRoof(parkingDetail.hasRoof)
         setIsEditMode(true)
+        setIsMenuOpen(false)
     }
 
     const handleDeleteParking = () => {
+        setIsMenuOpen(false)
+
         const isConfirmed = window.confirm('이 주차장 정보를 삭제할까요? 삭제하면 되돌릴 수 없어요.')
 
         if (!isConfirmed) return
@@ -310,44 +314,70 @@ export function ParkingDetailPanel({parkingId, favoriteParkingIds, onClose, onRe
         <article className={styles.panel}>
             <header className={styles.summary}>
                 <div className={styles.actions}>
-                    {isAuthenticated && (
-                        <>
+                    <div className={styles.menuWrapper}>
+                        {isAuthenticated && (
                             <button
                                 type="button"
-                                className={styles.textButton}
-                                onClick={handleStartEdit}
+                                className={styles.iconButton}
+                                onClick={() => setIsMenuOpen((currentIsOpen) => !currentIsOpen)}
+                                aria-label="장소 정보 관리 메뉴"
+                                aria-haspopup="menu"
+                                aria-expanded={isMenuOpen}
                             >
-                                수정
+                                ⋯
                             </button>
-                            <button
-                                type="button"
-                                className={styles.textButton}
-                                onClick={handleDeleteParking}
-                                disabled={deleteParkingMutation.isPending}
-                            >
-                                삭제
-                            </button>
-                        </>
-                    )}
-                    <button
-                        type="button"
-                        className={styles.iconButton}
-                        onClick={() => {
-                            if (!isAuthenticated) {
-                                onRequireLogin()
-                                return
-                            }
-                            favoriteMutation.mutate()
-                        }}
-                        disabled={favoriteMutation.isPending}
-                        aria-label={parkingDetail.isFavorite ? '즐겨찾기에서 삭제' : '즐겨찾기에 추가'}
-                        aria-pressed={parkingDetail.isFavorite}
-                    >
-                        {parkingDetail.isFavorite ? '★' : '☆'}
-                    </button>
-                    <button type="button" className={styles.iconButton} onClick={onClose} aria-label="상세 정보 닫기">
-                        ×
-                    </button>
+                        )}
+
+                        {isMenuOpen && (
+                            <>
+                                <div
+                                    className={styles.menuBackdrop}
+                                    onClick={() => setIsMenuOpen(false)}
+                                />
+                                <div className={styles.menuDropdown} role="menu">
+                                    <button
+                                        type="button"
+                                        role="menuitem"
+                                        className={styles.menuItem}
+                                        onClick={handleStartEdit}
+                                    >
+                                        수정
+                                    </button>
+                                    <button
+                                        type="button"
+                                        role="menuitem"
+                                        className={`${styles.menuItem} ${styles.menuItemDanger}`}
+                                        onClick={handleDeleteParking}
+                                        disabled={deleteParkingMutation.isPending}
+                                    >
+                                        삭제
+                                    </button>
+                                </div>
+                            </>
+                        )}
+                    </div>
+
+                    <div className={styles.trailingActions}>
+                        <button
+                            type="button"
+                            className={styles.iconButton}
+                            onClick={() => {
+                                if (!isAuthenticated) {
+                                    onRequireLogin()
+                                    return
+                                }
+                                favoriteMutation.mutate()
+                            }}
+                            disabled={favoriteMutation.isPending}
+                            aria-label={parkingDetail.isFavorite ? '즐겨찾기에서 삭제' : '즐겨찾기에 추가'}
+                            aria-pressed={parkingDetail.isFavorite}
+                        >
+                            {parkingDetail.isFavorite ? '★' : '☆'}
+                        </button>
+                        <button type="button" className={styles.iconButton} onClick={onClose} aria-label="상세 정보 닫기">
+                            ×
+                        </button>
+                    </div>
                 </div>
 
                 <h2 className={styles.title}>{parkingDetail.name}</h2>

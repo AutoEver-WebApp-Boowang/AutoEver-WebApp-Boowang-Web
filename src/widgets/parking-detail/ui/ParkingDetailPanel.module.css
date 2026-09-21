@@ -50,8 +50,62 @@
     display: flex;
     height: 28px;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: space-between;
     gap: 12px;
+}
+
+.trailingActions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.menuWrapper {
+    position: relative;
+}
+
+.menuBackdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+}
+
+.menuDropdown {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    z-index: 11;
+    display: flex;
+    min-width: 96px;
+    flex-direction: column;
+    overflow: hidden;
+    background-color: var(--color-background-panel);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-small);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.menuItem {
+    padding: 10px 14px;
+    color: var(--color-text-primary);
+    text-align: left;
+    background: transparent;
+    border: 0;
+    font-size: var(--font-size-body);
+    cursor: pointer;
+}
+
+.menuItem:hover {
+    background-color: var(--color-background-neutral);
+}
+
+.menuItem:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+.menuItemDanger {
+    color: var(--color-danger, #e53e3e);
 }
 
 .iconButton {
@@ -419,24 +473,6 @@
     color: var(--color-text-supporting);
     font-size: var(--font-size-body);
     text-align: center;
-}
-
-.textButton {
-    padding: 0 4px;
-    color: var(--color-text-supporting);
-    background: transparent;
-    border: 0;
-    font-size: var(--font-size-meta);
-    cursor: pointer;
-}
-
-.textButton:hover {
-    color: var(--color-text-primary);
-}
-
-.textButton:disabled {
-    opacity: 0.5;
-    cursor: default;
 }
 
 .editInput {
