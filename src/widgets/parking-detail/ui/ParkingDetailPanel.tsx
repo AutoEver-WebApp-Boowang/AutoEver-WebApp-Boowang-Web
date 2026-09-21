@@ -63,6 +63,7 @@ export function ParkingDetailPanel({parkingId, favoriteParkingIds, onClose, onRe
     const accessToken = useAppSelector((state) => state.auth.accessToken)
     const tokenType = useAppSelector((state) => state.auth.tokenType)
     const userId = useAppSelector((state) => state.auth.user?.id)
+    const userNickname = useAppSelector((state) => state.auth.user?.nickname)
     const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated)
 
     const parkingDetailQuery = useQuery({
@@ -73,8 +74,8 @@ export function ParkingDetailPanel({parkingId, favoriteParkingIds, onClose, onRe
 
     const parkingReviewsQuery = useQuery({
         queryKey: ['parking', 'reviews', parkingId],
-        queryFn: ({signal}) => getParkingReviews(parkingId, signal),
-        enabled: activeTab === 'reviews',
+        queryFn: ({signal}) => getParkingReviews(parkingId, accessToken!, tokenType!, signal),
+        enabled: activeTab === 'reviews' && isAuthenticated,
         retry: false,
     })
 
@@ -82,7 +83,13 @@ export function ParkingDetailPanel({parkingId, favoriteParkingIds, onClose, onRe
         mutationFn: ({reviewId, isCurrentlyLiked}: {
             reviewId: number
             isCurrentlyLiked: boolean
-        }) => updateReviewLike(reviewId, isCurrentlyLiked),
+        }) => {
+            const currentLikeCount = parkingReviewsQuery.data?.find(
+                (review) => review.id === reviewId,
+            )?.likeCount ?? 0
+
+            return updateReviewLike(reviewId, isCurrentlyLiked, currentLikeCount, accessToken!, tokenType!)
+        },
         onSuccess: (result, {reviewId}) => {
             queryClient.setQueryData<ParkingReviewData[]>(
                 ['parking', 'reviews', parkingId],
@@ -100,10 +107,12 @@ export function ParkingDetailPanel({parkingId, favoriteParkingIds, onClose, onRe
     })
 
     const createReviewMutation = useMutation({
-        mutationFn: (content: string) => createReview({
-            parkingId,
-            content,
-        }),
+        mutationFn: (content: string) => createReview(
+            {parkingId, content},
+            userNickname ?? '',
+            accessToken!,
+            tokenType!,
+        ),
         onSuccess: (newReview) => {
             queryClient.setQueryData<ParkingReviewData[]>(
                 ['parking', 'reviews', parkingId],
@@ -605,7 +614,11 @@ export function ParkingDetailPanel({parkingId, favoriteParkingIds, onClose, onRe
                         </button>
                     </div>
 
-                    {parkingReviewsQuery.isFetching ? (
+                    {!isAuthenticated ? (
+                        <p className={styles.emptyReviews}>
+                            리뷰는 로그인 후 확인할 수 있어요.
+                        </p>
+                    ) : parkingReviewsQuery.isFetching ? (
                         <div className={styles.reviewLoading} role="status" aria-live="polite">
                             <span className={styles.reviewLoadingSpinner} aria-hidden="true"/>
                             <span>리뷰를 불러오는 중입니다.</span>

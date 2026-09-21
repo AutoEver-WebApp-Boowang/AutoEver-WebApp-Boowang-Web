@@ -1,14 +1,14 @@
 import {mockParkingReviews} from '../model/mock'
 import type {CreateReviewInput, ParkingReviewData, ReviewLikeResult} from '../model/types'
 
-export async function createMockReview({
-    parkingId,
-    content,
-}: CreateReviewInput): Promise<ParkingReviewData> {
+export async function createMockReview(
+    {parkingId, content}: CreateReviewInput,
+    authorNickname: string,
+): Promise<ParkingReviewData> {
     const newReview: ParkingReviewData = {
         id: Date.now(),
         parkingId,
-        authorNickname: '테스트 라이더',
+        authorNickname,
         content,
         likeCount: 0,
         isLiked: false,
@@ -33,7 +33,11 @@ export async function getMockParkingReviews(
     )
 }
 
-export async function updateMockReviewLike(reviewId: number): Promise<ReviewLikeResult> {
+export async function updateMockReviewLike(
+    reviewId: number,
+    isCurrentlyLiked: boolean,
+    currentLikeCount: number,
+): Promise<ReviewLikeResult> {
     const review = mockParkingReviews.find(
         (item) => item.id === reviewId,
     )
@@ -42,10 +46,10 @@ export async function updateMockReviewLike(reviewId: number): Promise<ReviewLike
         throw new Error('리뷰를 찾을 수 없습니다.')
     }
 
-    review.isLiked = !review.isLiked
+    review.isLiked = !isCurrentlyLiked
     review.likeCount = review.isLiked
-        ? review.likeCount + 1
-        : Math.max(review.likeCount - 1, 0)
+        ? currentLikeCount + 1
+        : Math.max(currentLikeCount - 1, 0)
 
     return {
         isLiked: review.isLiked,
