@@ -1,24 +1,44 @@
 import {useState} from 'react'
+import {useMutation} from '@tanstack/react-query'
+import {updateParkingReaction, type ParkingReactionType} from '@/entities/parking'
 import styles from './ParkingReactionButtons.module.css'
 
-type Reaction = 'recommend' | 'notRecommend' | null
-
 type ParkingReactionButtonsProps = {
+    parkingId: number
     initialRecommendCount: number
     initialNotRecommendCount?: number
     isAuthenticated: boolean
+    accessToken: string | null
+    tokenType: string | null
     onRequireLogin: () => void
 }
 
 export function ParkingReactionButtons({
+    parkingId,
     initialRecommendCount,
     initialNotRecommendCount = 0,
     isAuthenticated,
+    accessToken,
+    tokenType,
     onRequireLogin,
 }: ParkingReactionButtonsProps) {
-    const [reaction, setReaction] = useState<Reaction>(null)
+    const [reaction, setReaction] = useState<ParkingReactionType>(null)
     const [recommendCount, setRecommendCount] = useState(initialRecommendCount)
     const [notRecommendCount, setNotRecommendCount] = useState(initialNotRecommendCount)
+
+    // 백엔드가 "내가 이전에 누른 반응"을 알려주는 필드를 아직 안 내려줘서,
+    // 화면상의 선택 상태(reaction)는 새로고침하면 초기화됨. 카운트/저장 자체는 정상적으로 서버에 반영됨.
+    const reactionMutation = useMutation({
+        mutationFn: (nextReaction: ParkingReactionType) => updateParkingReaction(
+            parkingId,
+            nextReaction,
+            accessToken!,
+            tokenType!,
+        ),
+        onError: () => {
+            window.alert('처리 중 문제가 발생했어요. 다시 시도해주세요.')
+        },
+    })
 
     const handleRecommend = () => {
         if (!isAuthenticated) {
@@ -29,6 +49,7 @@ export function ParkingReactionButtons({
         if (reaction === 'recommend') {
             setReaction(null)
             setRecommendCount((count) => Math.max(count - 1, 0))
+            reactionMutation.mutate(null)
             return
         }
 
@@ -38,6 +59,7 @@ export function ParkingReactionButtons({
 
         setReaction('recommend')
         setRecommendCount((count) => count + 1)
+        reactionMutation.mutate('recommend')
     }
 
     const handleNotRecommend = () => {
@@ -49,6 +71,7 @@ export function ParkingReactionButtons({
         if (reaction === 'notRecommend') {
             setReaction(null)
             setNotRecommendCount((count) => Math.max(count - 1, 0))
+            reactionMutation.mutate(null)
             return
         }
 
@@ -58,6 +81,7 @@ export function ParkingReactionButtons({
 
         setReaction('notRecommend')
         setNotRecommendCount((count) => count + 1)
+        reactionMutation.mutate('notRecommend')
     }
 
     return (

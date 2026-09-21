@@ -567,8 +567,12 @@ export function ParkingDetailPanel({parkingId, favoriteParkingIds, onClose, onRe
                     )}
 
                     <ParkingReactionButtons
+                        parkingId={parkingId}
                         initialRecommendCount={parkingDetail.recommendCount}
+                        initialNotRecommendCount={parkingDetail.notRecommendCount}
                         isAuthenticated={isAuthenticated}
+                        accessToken={accessToken}
+                        tokenType={tokenType}
                         onRequireLogin={onRequireLogin}
                     />
 

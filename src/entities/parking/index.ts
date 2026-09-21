@@ -16,5 +16,7 @@ export {
     searchRegisteredParking,
     updateParkingFavorite,
     updateParkingInfo,
+    updateParkingReaction,
 } from './api/parkingRepository'
+export type {ParkingReactionType} from './api/parkingRepository'
 export type {PlaceUpdateRequest} from './api/types'

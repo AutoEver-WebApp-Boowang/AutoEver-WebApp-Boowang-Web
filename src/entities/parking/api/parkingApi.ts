@@ -213,3 +213,48 @@ export async function deleteApiParking(
         throw new Error(`주차장 삭제 실패: ${response.status}`)
     }
 }
+
+// 주차장 추천/비추천 등록 (같은 유저가 이미 다른 반응을 남겼어도 그대로 덮어씀)
+export async function postApiParkingReaction(
+    parkingId: number,
+    reactionType: '추천' | '비추천',
+    accessToken: string,
+    tokenType: string,
+): Promise<void> {
+    const response = await fetch(
+        `${env.apiBaseUrl}/api/places/${parkingId}/reactions`,
+        {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `${tokenType} ${accessToken}`,
+            },
+            body: JSON.stringify({reactionType}),
+        },
+    )
+
+    if (!response.ok) {
+        throw new Error(`추천/비추천 처리 실패: ${response.status}`)
+    }
+}
+
+// 주차장 추천/비추천 취소
+export async function deleteApiParkingReaction(
+    parkingId: number,
+    accessToken: string,
+    tokenType: string,
+): Promise<void> {
+    const response = await fetch(
+        `${env.apiBaseUrl}/api/places/${parkingId}/reactions`,
+        {
+            method: 'DELETE',
+            headers: {
+                Authorization: `${tokenType} ${accessToken}`,
+            },
+        },
+    )
+
+    if (!response.ok) {
+        throw new Error(`추천/비추천 취소 실패: ${response.status}`)
+    }
+}

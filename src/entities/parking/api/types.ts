@@ -40,3 +40,7 @@ export type PlaceUpdateRequest = {
     capacity: number
     hasRoof: boolean
 }
+
+export type PlaceReactionRequest = {
+    reactionType: '추천' | '비추천'
+}

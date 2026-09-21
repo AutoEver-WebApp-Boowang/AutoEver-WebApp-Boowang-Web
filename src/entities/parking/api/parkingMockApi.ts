@@ -146,3 +146,11 @@ export async function deleteMockParkingInfo(parkingId: number): Promise<void> {
         mockParkingDetails.splice(detailIndex, 1)
     }
 }
+
+export async function postMockParkingReaction(): Promise<void> {
+    return
+}
+
+export async function deleteMockParkingReaction(): Promise<void> {
+    return
+}

@@ -9,6 +9,8 @@ import {
     updateApiParkingFavorite,
     updateApiParkingInfo,
     deleteApiParking,
+    postApiParkingReaction,
+    deleteApiParkingReaction,
 } from './parkingApi'
 import {
     getMockFavoriteParkingList,
@@ -19,6 +21,8 @@ import {
     updateMockParkingFavorite,
     updateMockParkingInfo,
     deleteMockParkingInfo,
+    postMockParkingReaction,
+    deleteMockParkingReaction,
 } from './parkingMockApi'
 import type {ParkingCardData, ParkingDetailData, ParkingFavoriteResult} from '../model/types'
 import type {PlaceUpdateRequest} from './types'
@@ -121,4 +125,26 @@ export function deleteParking(
     }
 
     return deleteApiParking(parkingId, accessToken, tokenType)
+}
+
+export type ParkingReactionType = 'recommend' | 'notRecommend' | null
+
+export function updateParkingReaction(
+    parkingId: number,
+    reaction: ParkingReactionType,
+    accessToken: string,
+    tokenType: string,
+): Promise<void> {
+    if (env.apiMode === 'mock') {
+        return reaction === null
+            ? deleteMockParkingReaction()
+            : postMockParkingReaction()
+    }
+
+    if (reaction === null) {
+        return deleteApiParkingReaction(parkingId, accessToken, tokenType)
+    }
+
+    const reactionType = reaction === 'recommend' ? '추천' : '비추천'
+    return postApiParkingReaction(parkingId, reactionType, accessToken, tokenType)
 }
