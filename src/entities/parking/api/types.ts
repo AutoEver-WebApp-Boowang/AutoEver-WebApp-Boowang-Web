@@ -53,6 +53,7 @@ export type PlaceRegisterRequest = {
     longitude: number
     type: string
     isFree: boolean
+    feeDescription?: string
     hasRoof: boolean
     operatingHours: string
     capacity?: number

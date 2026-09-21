@@ -59,6 +59,7 @@ export type ParkingRegisterInput = {
     longitude: number
     type: '공영' | '제보'
     isFree: boolean
+    feeDescription: string | null
     hasRoof: boolean
     operatingHours: string
     capacity: number | null

@@ -73,6 +73,7 @@ export function toPlaceRegisterRequest(input: ParkingRegisterInput): PlaceRegist
         longitude: input.longitude,
         type: input.type,
         isFree: input.isFree,
+        feeDescription: input.feeDescription ?? undefined,
         hasRoof: input.hasRoof,
         operatingHours: input.operatingHours,
         capacity: input.capacity ?? undefined,

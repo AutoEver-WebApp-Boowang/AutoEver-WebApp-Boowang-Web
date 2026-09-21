@@ -36,6 +36,7 @@ export function ParkingRegisterModal({
 
     const [name, setName] = useState('')
     const [isFree, setIsFree] = useState(true)
+    const [feeDescription, setFeeDescription] = useState('')
     const [operatingHours, setOperatingHours] = useState('')
     const [capacity, setCapacity] = useState('')
     const [hasRoof, setHasRoof] = useState(true)
@@ -130,6 +131,7 @@ export function ParkingRegisterModal({
                     longitude: currentPosition.longitude,
                     type: PLACE_TYPE,
                     isFree,
+                    feeDescription: isFree ? null : (feeDescription.trim() || null),
                     hasRoof,
                     operatingHours: operatingHours.trim(),
                     capacity: capacity.trim() ? Number(capacity) : null,
@@ -233,12 +235,10 @@ export function ParkingRegisterModal({
                     </section>
 
                     <section className={styles.field}>
-                        <p className={styles.label}>
-                            주차장 종류 <span className={styles.required}>필수</span>
-                        </p>
+                        <p className={styles.label}>주차장 종류</p>
                         <div className={styles.segmentedGroup}>
                             <span className={styles.segmentSelected}>
-                                노상 · 제보
+                                제보
                             </span>
                         </div>
                     </section>
@@ -263,6 +263,14 @@ export function ParkingRegisterModal({
                                 유료
                             </button>
                         </div>
+                        {!isFree && (
+                            <input
+                                className={styles.textInput}
+                                value={feeDescription}
+                                onChange={(event) => setFeeDescription(event.target.value)}
+                                placeholder="예) 1시간 500원"
+                            />
+                        )}
                     </section>
 
                     <section className={styles.field}>
