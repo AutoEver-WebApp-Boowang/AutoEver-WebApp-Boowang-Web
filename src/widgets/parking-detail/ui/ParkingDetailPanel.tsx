@@ -70,8 +70,14 @@ export function ParkingDetailPanel({parkingId, favoriteParkingIds, onClose, onRe
     const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated)
 
     const parkingDetailQuery = useQuery({
-        queryKey: ['parking', 'detail', parkingId],
-        queryFn: ({signal}) => getParkingDetail(parkingId, favoriteParkingIds.has(parkingId), signal),
+        queryKey: ['parking', 'detail', parkingId, accessToken],
+        queryFn: ({signal}) => getParkingDetail(
+            parkingId,
+            favoriteParkingIds.has(parkingId),
+            accessToken,
+            tokenType,
+            signal,
+        ),
         retry: false,
     })
 

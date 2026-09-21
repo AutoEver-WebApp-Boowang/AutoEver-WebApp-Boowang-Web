@@ -116,11 +116,18 @@ export async function getApiParkingListByBounds(
 export async function getApiParkingDetail(
     parkingId: number,
     isFavorite: boolean,
+    accessToken: string | null,
+    tokenType: string | null,
     signal?: AbortSignal,
 ): Promise<ParkingDetailData> {
     const response = await fetch(
         `${env.apiBaseUrl}/api/places/${parkingId}`,
-        {signal},
+        {
+            signal,
+            headers: accessToken && tokenType
+                ? {Authorization: `${tokenType} ${accessToken}`}
+                : undefined,
+        },
     )
 
     if (!response.ok) {

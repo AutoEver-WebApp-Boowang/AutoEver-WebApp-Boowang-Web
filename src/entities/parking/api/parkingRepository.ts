@@ -57,13 +57,15 @@ export function getFavoriteParkingList(
 export function getParkingDetail(
     parkingId: number,
     isFavorite: boolean,
+    accessToken: string | null,
+    tokenType: string | null,
     signal?: AbortSignal,
 ): Promise<ParkingDetailData> {
     if (env.apiMode === 'mock') {
         return getMockParkingDetail(parkingId, signal)
     }
 
-    return getApiParkingDetail(parkingId, isFavorite, signal)
+    return getApiParkingDetail(parkingId, isFavorite, accessToken, tokenType, signal)
 }
 
 export function updateParkingFavorite(
