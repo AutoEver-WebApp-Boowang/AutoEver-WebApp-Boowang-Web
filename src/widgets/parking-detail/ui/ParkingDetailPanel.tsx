@@ -546,6 +546,12 @@ export function ParkingDetailPanel({parkingId, favoriteParkingIds, onClose, onRe
                             <dt>주소</dt>
                             <dd>{parkingDetail.address}</dd>
                         </div>
+                        {parkingDetail.detailAddress && (
+                            <div className={styles.informationItem}>
+                                <dt>상세 주소</dt>
+                                <dd>{parkingDetail.detailAddress}</dd>
+                            </div>
+                        )}
                         <div className={styles.informationItem}>
                             <dt>이용 요금</dt>
                             {isEditMode ? (

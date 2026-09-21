@@ -48,6 +48,7 @@ export function toParkingDetailData(
         id: place.id,
         name: place.name,
         address: place.address,
+        detailAddress: place.detailAddress,
         type: toParkingDetailType(place.type),
         isFree: place.isFree,
         hasRoof: place.hasRoof,

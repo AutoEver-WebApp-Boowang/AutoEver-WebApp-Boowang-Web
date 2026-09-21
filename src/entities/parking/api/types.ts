@@ -18,6 +18,7 @@ export type PlaceDetailResponse = {
     id: number
     name: string
     address: string
+    detailAddress: string | null
     latitude: number
     longitude: number
     isFree: boolean

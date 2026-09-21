@@ -28,6 +28,7 @@ export type ParkingDetailData = {
     id: number
     name: string
     address: string
+    detailAddress: string | null
     type: '공영' | '제보'
 
     isFree: boolean
