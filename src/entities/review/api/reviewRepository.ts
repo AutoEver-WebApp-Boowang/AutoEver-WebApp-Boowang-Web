@@ -8,12 +8,12 @@ export function createReview(
     authorNickname: string,
     accessToken: string,
     tokenType: string,
-): Promise<ParkingReviewData> {
+): Promise<void> {
     if (env.apiMode === 'mock') {
         return createMockReview(input, authorNickname)
     }
 
-    return createApiReview(input, authorNickname, accessToken, tokenType)
+    return createApiReview(input, accessToken, tokenType)
 }
 
 export function getParkingReviews(

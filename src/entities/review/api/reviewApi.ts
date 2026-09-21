@@ -1,18 +1,19 @@
 import {env} from '@/shared/config'
 import type {ApiResponse} from '@/shared/api'
 import type {CreateReviewInput, ParkingReviewData, ReviewLikeResult} from '../model/types'
-import type {ReviewCreateResponse, ReviewListResponse, ReviewLikeResponse} from './types'
+import type {ReviewListResponse, ReviewLikeResponse} from './types'
 import {toParkingReviewData} from './reviewMapper'
 
 // 페이지네이션 UI 없이 한 번에 다 가져오기 위한 임시 큰 값
 const REVIEW_PAGE_SIZE = 100
 
+// 서버가 {id, createdAt}만 내려주고 작성된 리뷰 전체를 안 돌려줘서,
+// 등록 성공 후 화면 갱신은 이 값을 쓰는 대신 목록을 다시 조회하는 방식으로 처리한다.
 export async function createApiReview(
     {parkingId, content}: CreateReviewInput,
-    authorNickname: string,
     accessToken: string,
     tokenType: string,
-): Promise<ParkingReviewData> {
+): Promise<void> {
     const response = await fetch(
         `${env.apiBaseUrl}/api/places/${parkingId}/reviews`,
         {
@@ -27,19 +28,6 @@ export async function createApiReview(
 
     if (!response.ok) {
         throw new Error(`리뷰 등록 실패: ${response.status}`)
-    }
-
-    // 서버는 {id, createdAt}만 내려주므로, 나머지 필드는 우리가 보낸 값/현재 로그인한 유저 정보로 채운다
-    const result: ApiResponse<ReviewCreateResponse> = await response.json()
-
-    return {
-        id: result.data.id,
-        parkingId,
-        authorNickname,
-        content,
-        likeCount: 0,
-        isLiked: false,
-        createdAt: result.data.createdAt,
     }
 }
 

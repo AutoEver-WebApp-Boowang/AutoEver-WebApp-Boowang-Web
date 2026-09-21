@@ -113,21 +113,14 @@ export function ParkingDetailPanel({parkingId, favoriteParkingIds, onClose, onRe
             accessToken!,
             tokenType!,
         ),
-        onSuccess: (newReview) => {
-            queryClient.setQueryData<ParkingReviewData[]>(
-                ['parking', 'reviews', parkingId],
-                (currentReviews = []) => [newReview, ...currentReviews],
-            )
-
-            queryClient.setQueryData<ParkingDetailData>(
-                ['parking', 'detail', parkingId],
-                (currentDetail) => currentDetail
-                    ? {
-                        ...currentDetail,
-                        reviewCount: currentDetail.reviewCount + 1,
-                    }
-                    : currentDetail,
-            )
+        onSuccess: () => {
+            // 서버가 생성된 리뷰 전체를 안 돌려줘서, 목록/상세를 다시 조회해서 최신 상태로 갱신한다
+            void queryClient.invalidateQueries({
+                queryKey: ['parking', 'reviews', parkingId],
+            })
+            void queryClient.invalidateQueries({
+                queryKey: ['parking', 'detail', parkingId],
+            })
         },
     })
 

@@ -4,7 +4,7 @@ import type {CreateReviewInput, ParkingReviewData, ReviewLikeResult} from '../mo
 export async function createMockReview(
     {parkingId, content}: CreateReviewInput,
     authorNickname: string,
-): Promise<ParkingReviewData> {
+): Promise<void> {
     const newReview: ParkingReviewData = {
         id: Date.now(),
         parkingId,
@@ -16,8 +16,6 @@ export async function createMockReview(
     }
 
     mockParkingReviews.unshift(newReview)
-
-    return newReview
 }
 
 export async function getMockParkingReviews(
