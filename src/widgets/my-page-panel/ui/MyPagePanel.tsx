@@ -7,17 +7,33 @@ import styles from './MyPagePanel.module.css'
 
 const FEEDBACK_FORM_URL = 'https://forms.gle/d757kmTL9GqnQoMo6'
 
-// 등급별 임계값이 아직 백엔드에 없어서 100점 단위로 임시 가정한 값.
-// 실제 등급 기준이 정해지면 이 부분을 그 기준으로 교체해야 함.
-const TRUST_LEVEL_STEP = 100
+// 등급별 점수 기준 (0~100 바린이 / 101~200 쿼터라이더 / 201~300 미들라이더 / 301~ 리터라이더)
+const TRUST_LEVEL_THRESHOLDS = [
+    {code: 'BEGINNER', minScore: 0},
+    {code: 'INTERMEDIATE', minScore: 101},
+    {code: 'EXPERT', minScore: 201},
+    {code: 'LITER_RIDER', minScore: 301},
+]
 
 function getNextLevelProgress(trustScore: number) {
-    const currentLevelFloor = Math.floor(trustScore / TRUST_LEVEL_STEP) * TRUST_LEVEL_STEP
-    const nextLevelThreshold = currentLevelFloor + TRUST_LEVEL_STEP
+    let currentIndex = 0
+    for (let i = 0; i < TRUST_LEVEL_THRESHOLDS.length; i++) {
+        if (trustScore >= TRUST_LEVEL_THRESHOLDS[i].minScore) currentIndex = i
+    }
+
+    const currentLevel = TRUST_LEVEL_THRESHOLDS[currentIndex]
+    const nextLevel = TRUST_LEVEL_THRESHOLDS[currentIndex + 1]
+
+    if (!nextLevel) {
+        return {isMaxLevel: true as const, pointsUntilNextLevel: 0, progressRatio: 1}
+    }
+
+    const rangeSize = nextLevel.minScore - currentLevel.minScore
 
     return {
-        pointsUntilNextLevel: nextLevelThreshold - trustScore,
-        progressRatio: (trustScore - currentLevelFloor) / TRUST_LEVEL_STEP,
+        isMaxLevel: false as const,
+        pointsUntilNextLevel: nextLevel.minScore - trustScore,
+        progressRatio: (trustScore - currentLevel.minScore) / rangeSize,
     }
 }
 
@@ -80,7 +96,9 @@ export function MyPagePanel() {
                                     {myProfileQuery.data.trustLevel.displayName}
                                 </p>
                                 <p className={styles.trustCardMeta}>
-                                    다음 등급까지 {getNextLevelProgress(myProfileQuery.data.trustScore).pointsUntilNextLevel}점
+                                    {getNextLevelProgress(myProfileQuery.data.trustScore).isMaxLevel
+                                        ? '최고 등급이에요'
+                                        : `다음 등급까지 ${getNextLevelProgress(myProfileQuery.data.trustScore).pointsUntilNextLevel}점`}
                                 </p>
                             </div>
 
