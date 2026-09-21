@@ -65,17 +65,13 @@ export function toParkingDetailData(
         myReaction: toParkingReactionType(place.myReaction),
     }
 }
-function toPlaceType(type: '공영' | '제보'): string {
-    return type === '공영' ? 'PUBLIC' : 'USER'
-}
-
 export function toPlaceRegisterRequest(input: ParkingRegisterInput): PlaceRegisterRequest {
     return {
         name: input.name,
         address: input.address,
         latitude: input.latitude,
         longitude: input.longitude,
-        type: toPlaceType(input.type),
+        type: input.type,
         isFree: input.isFree,
         hasRoof: input.hasRoof,
         operatingHours: input.operatingHours,
