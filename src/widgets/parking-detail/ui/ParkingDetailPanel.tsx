@@ -187,7 +187,7 @@ export function ParkingDetailPanel({parkingId, favoriteParkingIds, onClose, onRe
         ),
         onSuccess: (result) => {
             queryClient.setQueryData<ParkingDetailData>(
-                ['parking', 'detail', parkingId],
+                ['parking', 'detail', parkingId, accessToken],
                 (currentDetail) => currentDetail
                     ? {
                         ...currentDetail,
@@ -215,7 +215,7 @@ export function ParkingDetailPanel({parkingId, favoriteParkingIds, onClose, onRe
         ),
         onSuccess: () => {
             queryClient.setQueryData<ParkingDetailData>(
-                ['parking', 'detail', parkingId],
+                ['parking', 'detail', parkingId, accessToken],
                 (currentDetail) => currentDetail
                     ? {
                         ...currentDetail,
