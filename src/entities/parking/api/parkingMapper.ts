@@ -21,14 +21,14 @@ export function toParkingCardData(place: PlaceSummaryResponse): ParkingCardData 
 }
 
 function toParkingSource(type: string): ParkingSource {
-    if (type === 'PUBLIC') return 'public'
-    if (type === 'USER') return 'user'
+    if (type === '공영') return 'public'
+    if (type === '제보') return 'user'
     throw new Error(`알 수 없는 주차장 타입: ${type}`)
 }
 
 function toParkingDetailType(type: string): '공영' | '제보' {
-    if (type === 'PUBLIC') return '공영'
-    if (type === 'USER') return '제보'
+    if (type === '공영') return '공영'
+    if (type === '제보') return '제보'
 
     console.warn(`알 수 없는 주차장 타입: ${type}, '제보'로 처리합니다`)
     return '제보'
