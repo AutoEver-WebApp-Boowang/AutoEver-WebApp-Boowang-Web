@@ -1,7 +1,7 @@
 // 실제 백엔드 API호출
 import {env} from '@/shared/config'
 import type {ParkingCardData, ParkingDetailData, ParkingFavoriteResult} from '../model/types'
-import type {PlaceDetailResponse, PlaceSummaryResponse, PlaceUpdateRequest} from "@/entities/parking/api/types.ts";
+import type {PlaceDetailResponse, PlaceRegisterRequest, PlaceSummaryResponse, PlaceUpdateRequest} from "@/entities/parking/api/types.ts";
 import {toParkingCardData, toParkingDetailData} from "@/entities/parking/api/parkingMapper.ts";
 import type {ApiResponse} from "@/shared/api";
 
@@ -263,5 +263,66 @@ export async function deleteApiParkingReaction(
 
     if (!response.ok) {
         throw new Error(`추천/비추천 취소 실패: ${response.status}`)
+    }
+}
+
+// 장소 등록
+export async function registerApiParking(
+    payload: PlaceRegisterRequest,
+    accessToken: string,
+    tokenType: string,
+): Promise<number> {
+    const response = await fetch(
+        `${env.apiBaseUrl}/api/places`,
+        {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `${tokenType} ${accessToken}`,
+            },
+            body: JSON.stringify(payload),
+        },
+    )
+
+    if (!response.ok) {
+        throw new Error(`주차장 등록 실패: ${response.status}`)
+    }
+
+    const result: Record<string, number> = await response.json()
+    const placeId = result.placeId ?? result.id ?? Object.values(result)[0]
+
+    if (typeof placeId !== 'number') {
+        throw new Error('등록된 주차장 정보를 확인할 수 없습니다.')
+    }
+
+    return placeId
+}
+
+// 장소 사진 업로드
+export async function uploadApiParkingPhoto(
+    parkingId: number,
+    file: File,
+    sortOrder: number,
+    accessToken: string,
+    tokenType: string,
+): Promise<void> {
+    const formData = new FormData()
+    formData.append('file', file)
+
+    const searchParams = new URLSearchParams({sortOrder: String(sortOrder)})
+
+    const response = await fetch(
+        `${env.apiBaseUrl}/api/places/${parkingId}/photos?${searchParams}`,
+        {
+            method: 'POST',
+            headers: {
+                Authorization: `${tokenType} ${accessToken}`,
+            },
+            body: formData,
+        },
+    )
+
+    if (!response.ok) {
+        throw new Error(`사진 업로드 실패: ${response.status}`)
     }
 }

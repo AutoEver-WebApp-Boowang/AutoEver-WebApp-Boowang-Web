@@ -154,3 +154,14 @@ export async function postMockParkingReaction(): Promise<void> {
 export async function deleteMockParkingReaction(): Promise<void> {
     return
 }
+
+let mockNextPlaceId = 1000
+
+export async function registerMockParking(): Promise<number> {
+    mockNextPlaceId += 1
+    return mockNextPlaceId
+}
+
+export async function uploadMockParkingPhoto(): Promise<void> {
+    return
+}

@@ -76,6 +76,13 @@
     bottom: 24px;
 }
 
+.registerControl {
+    position: absolute;
+    z-index: 10;
+    right: 24px;
+    bottom: 96px;
+}
+
 .locationError {
     position: absolute;
     right: 0;

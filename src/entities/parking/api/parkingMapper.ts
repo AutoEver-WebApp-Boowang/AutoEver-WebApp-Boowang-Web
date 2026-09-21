@@ -1,5 +1,5 @@
-import type {PlaceDetailResponse, PlaceSummaryResponse} from "@/entities/parking/api/types.ts";
-import type {ParkingCardData, ParkingDetailData, ParkingReactionType, ParkingSource} from "@/entities/parking";
+import type {PlaceDetailResponse, PlaceRegisterRequest, PlaceSummaryResponse} from "@/entities/parking/api/types.ts";
+import type {ParkingCardData, ParkingDetailData, ParkingReactionType, ParkingRegisterInput, ParkingSource} from "@/entities/parking";
 
 export function toParkingCardData(place: PlaceSummaryResponse): ParkingCardData {
     return {
@@ -63,5 +63,23 @@ export function toParkingDetailData(
         updatedAt: place.updatedAt,
         isFavorite,
         myReaction: toParkingReactionType(place.myReaction),
+    }
+}
+function toPlaceType(type: '공영' | '제보'): string {
+    return type === '공영' ? 'PUBLIC' : 'USER'
+}
+
+export function toPlaceRegisterRequest(input: ParkingRegisterInput): PlaceRegisterRequest {
+    return {
+        name: input.name,
+        address: input.address,
+        latitude: input.latitude,
+        longitude: input.longitude,
+        type: toPlaceType(input.type),
+        isFree: input.isFree,
+        hasRoof: input.hasRoof,
+        operatingHours: input.operatingHours,
+        capacity: input.capacity ?? undefined,
+        description: input.description ?? undefined,
     }
 }

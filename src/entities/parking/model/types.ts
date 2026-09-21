@@ -51,3 +51,16 @@ export type ParkingDetailData = {
 export type ParkingFavoriteResult = {
     isFavorite: boolean
 }
+
+export type ParkingRegisterInput = {
+    name: string
+    address: string
+    latitude: number
+    longitude: number
+    type: '공영' | '제보'
+    isFree: boolean
+    hasRoof: boolean
+    operatingHours: string
+    capacity: number | null
+    description: string | null
+}

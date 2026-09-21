@@ -3,6 +3,7 @@ import {CustomOverlayMap, Map, MapMarker, useKakaoLoader} from 'react-kakao-maps
 import styles from './ParkingMap.module.css'
 import type {ParkingCardData} from "@/entities/parking";
 import {CurrentLocationButton, type CurrentPosition} from "@/features/current-location";
+import {ParkingRegisterButton, ParkingRegisterModal} from "@/features/parking-create";
 
 const DEFAULT_CENTER = {
     lat: 37.5665,
@@ -46,6 +47,11 @@ type ParkingMapProps = {
     currentLocationError: string | null
     isLocating: boolean
     onCurrentLocationRequest: () => void
+
+    isAuthenticated: boolean
+    accessToken: string | null
+    tokenType: string | null
+    onRequireLogin: () => void
 }
 
 
@@ -59,6 +65,11 @@ export function ParkingMap({
                                currentLocationError,
                                isLocating,
                                onCurrentLocationRequest,
+
+                               isAuthenticated,
+                               accessToken,
+                               tokenType,
+                               onRequireLogin,
 
                                focusPosition,
                                onFocusApplied,
@@ -77,6 +88,7 @@ export function ParkingMap({
     })
 
     const [shouldMoveToCurrentPosition, setShouldMoveToCurrentPosition,] = useState(false)
+    const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false)
 
     const searchCurrentBounds = useCallback((
         map: kakao.maps.Map,
@@ -169,6 +181,15 @@ export function ParkingMap({
         if (!mapRef.current) return
 
         searchCurrentBounds(mapRef.current)
+    }
+
+    const handleRegisterButtonClick = () => {
+        if (!isAuthenticated) {
+            onRequireLogin()
+            return
+        }
+
+        setIsRegisterModalOpen(true)
     }
 
     const handleCurrentLocationClick = () => {
@@ -308,6 +329,10 @@ export function ParkingMap({
                 )}
             </Map>
 
+            <div className={styles.registerControl}>
+                <ParkingRegisterButton onClick={handleRegisterButtonClick}/>
+            </div>
+
             <div className={styles.currentLocationControl}>
                 <CurrentLocationButton
                     isLocating={isLocating}
@@ -323,6 +348,18 @@ export function ParkingMap({
                     </p>
                 )}
             </div>
+
+            {isRegisterModalOpen && (
+                <ParkingRegisterModal
+                    currentPosition={currentPosition}
+                    isLocating={isLocating}
+                    currentLocationError={currentLocationError}
+                    onRefreshLocation={onCurrentLocationRequest}
+                    accessToken={accessToken}
+                    tokenType={tokenType}
+                    onClose={() => setIsRegisterModalOpen(false)}
+                />
+            )}
 
             {showSearchBoundsButton && (
                 <button

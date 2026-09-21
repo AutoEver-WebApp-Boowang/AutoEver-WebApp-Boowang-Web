@@ -45,3 +45,16 @@ export type PlaceUpdateRequest = {
 export type PlaceReactionRequest = {
     reactionType: '추천' | '비추천'
 }
+
+export type PlaceRegisterRequest = {
+    name: string
+    address: string
+    latitude: number
+    longitude: number
+    type: string
+    isFree: boolean
+    hasRoof: boolean
+    operatingHours: string
+    capacity?: number
+    description?: string
+}

@@ -1,0 +1,30 @@
+.button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 16px;
+
+    background-color: var(--color-primary);
+    border: 0;
+    border-radius: var(--radius-nav-chip);
+    box-shadow: 0 3px 10px rgb(0 0 0 / 18%);
+
+    color: var(--color-white);
+    font-family: inherit;
+    font-size: var(--font-size-body);
+    font-weight: var(--font-weight-bold);
+    white-space: nowrap;
+
+    cursor: pointer;
+}
+
+.button:hover {
+    background-color: var(--color-primary-hover);
+}
+
+.icon {
+    display: block;
+    width: 14px;
+    height: 14px;
+    filter: brightness(0) invert(1);
+}

@@ -11,6 +11,8 @@ import {
     deleteApiParking,
     postApiParkingReaction,
     deleteApiParkingReaction,
+    registerApiParking,
+    uploadApiParkingPhoto,
 } from './parkingApi'
 import {
     getMockFavoriteParkingList,
@@ -23,8 +25,11 @@ import {
     deleteMockParkingInfo,
     postMockParkingReaction,
     deleteMockParkingReaction,
+    registerMockParking,
+    uploadMockParkingPhoto,
 } from './parkingMockApi'
-import type {ParkingCardData, ParkingDetailData, ParkingFavoriteResult, ParkingReactionType} from '../model/types'
+import type {ParkingCardData, ParkingDetailData, ParkingFavoriteResult, ParkingReactionType, ParkingRegisterInput} from '../model/types'
+import {toPlaceRegisterRequest} from './parkingMapper'
 import type {PlaceUpdateRequest} from './types'
 
 type ParkingBoundsParams = {
@@ -147,4 +152,30 @@ export function updateParkingReaction(
 
     const reactionType = reaction === 'recommend' ? '추천' : '비추천'
     return postApiParkingReaction(parkingId, reactionType, accessToken, tokenType)
+}
+
+export function registerParking(
+    input: ParkingRegisterInput,
+    accessToken: string,
+    tokenType: string,
+): Promise<number> {
+    if (env.apiMode === 'mock') {
+        return registerMockParking()
+    }
+
+    return registerApiParking(toPlaceRegisterRequest(input), accessToken, tokenType)
+}
+
+export function uploadParkingPhoto(
+    parkingId: number,
+    file: File,
+    sortOrder: number,
+    accessToken: string,
+    tokenType: string,
+): Promise<void> {
+    if (env.apiMode === 'mock') {
+        return uploadMockParkingPhoto()
+    }
+
+    return uploadApiParkingPhoto(parkingId, file, sortOrder, accessToken, tokenType)
 }

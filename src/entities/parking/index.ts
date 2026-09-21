@@ -6,6 +6,7 @@ export type {
     ParkingDetailData,
     ParkingFavoriteResult,
     ParkingReactionType,
+    ParkingRegisterInput,
     ParkingSource,
 } from './model/types'
 export {
@@ -14,9 +15,11 @@ export {
     getParkingDetail,
     getParkingList,
     getParkingListByBounds,
+    registerParking,
     searchRegisteredParking,
     updateParkingFavorite,
     updateParkingInfo,
     updateParkingReaction,
+    uploadParkingPhoto,
 } from './api/parkingRepository'
 export type {PlaceUpdateRequest} from './api/types'

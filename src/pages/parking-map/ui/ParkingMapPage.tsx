@@ -291,6 +291,11 @@ export function ParkingMapPage() {
                     isLocating={isLocating}
                     onCurrentLocationRequest={startWatching}
 
+                    isAuthenticated={isAuthenticated}
+                    accessToken={accessToken}
+                    tokenType={tokenType}
+                    onRequireLogin={handleRequireLogin}
+
                     focusPosition={mapFocusPosition}
                     onFocusApplied={handleMapFocusApplied}
                     searchedPlace={selectedKakaoPlace

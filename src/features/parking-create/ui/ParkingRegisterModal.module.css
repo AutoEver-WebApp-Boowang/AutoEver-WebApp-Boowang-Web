@@ -1,0 +1,353 @@
+.backdrop {
+    position: fixed;
+    z-index: 100;
+    inset: 0;
+
+    display: grid;
+    place-items: center;
+    padding: 16px;
+
+    background-color: rgb(15 23 32 / 45%);
+}
+
+.modal {
+    display: flex;
+    flex-direction: column;
+
+    width: 100%;
+    max-width: 420px;
+    max-height: min(720px, 100%);
+
+    background-color: var(--color-white);
+    border-radius: var(--radius-large);
+    box-shadow: 0 12px 32px rgb(26 38 51 / 22%);
+
+    overflow: hidden;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+
+    flex-shrink: 0;
+    padding: 20px 20px 16px 24px;
+
+    border-bottom: 1px solid var(--color-background-neutral);
+}
+
+.headerText {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.title {
+    margin: 0;
+    color: var(--color-text-primary);
+    font-size: var(--font-size-detail-title);
+    font-weight: var(--font-weight-bold);
+}
+
+.subtitle {
+    margin: 0;
+    color: var(--color-text-supporting);
+    font-size: var(--font-size-meta);
+}
+
+.closeButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    width: 28px;
+    height: 28px;
+    padding: 0;
+
+    background-color: var(--color-background-neutral);
+    border: 0;
+    border-radius: var(--radius-medium);
+    color: var(--color-text-secondary);
+    font-size: 16px;
+    line-height: 1;
+
+    cursor: pointer;
+}
+
+.body {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+
+    padding: 20px 24px;
+    overflow-y: auto;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.label {
+    margin: 0;
+    color: var(--color-text-section);
+    font-size: var(--font-size-meta);
+    font-weight: var(--font-weight-bold);
+}
+
+.required {
+    color: var(--color-primary);
+    font-size: var(--font-size-caption);
+    font-weight: var(--font-weight-bold);
+}
+
+.mapPreview {
+    display: grid;
+    place-items: center;
+    height: 116px;
+
+    background-color: var(--color-map-background);
+    border-radius: var(--radius-medium);
+}
+
+.mapPreviewPin {
+    display: block;
+    width: 30px;
+    height: 38px;
+}
+
+.addressRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.addressText {
+    color: var(--color-text-primary);
+    font-size: var(--font-size-body);
+}
+
+.refetchLocationButton {
+    flex-shrink: 0;
+    padding: 0;
+
+    background: transparent;
+    border: 0;
+    color: var(--color-primary);
+    font-size: var(--font-size-meta);
+    font-weight: var(--font-weight-bold);
+    white-space: nowrap;
+
+    cursor: pointer;
+}
+
+.refetchLocationButton:disabled {
+    opacity: 0.6;
+    cursor: default;
+}
+
+.locationErrorText {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: var(--font-size-caption);
+}
+
+.textInput,
+.textArea {
+    width: 100%;
+    padding: 11px 14px;
+
+    background-color: var(--color-white);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-medium);
+    color: var(--color-text-primary);
+    font-family: inherit;
+    font-size: var(--font-size-body);
+
+    box-sizing: border-box;
+}
+
+.textInput::placeholder,
+.textArea::placeholder {
+    color: var(--color-text-muted);
+}
+
+.textArea {
+    height: 72px;
+    resize: none;
+}
+
+.segmentedGroup {
+    display: flex;
+    gap: 8px;
+}
+
+.segment,
+.segmentSelected {
+    padding: 9px 14px;
+
+    border-radius: var(--radius-pill);
+    font-family: inherit;
+    font-size: var(--font-size-body);
+    white-space: nowrap;
+
+    cursor: pointer;
+}
+
+.segment {
+    background-color: var(--color-white);
+    border: 1px solid var(--color-border-default);
+    color: var(--color-text-secondary);
+    font-weight: var(--font-weight-regular);
+}
+
+.segmentSelected {
+    background-color: var(--color-background-selected);
+    border: 1px solid var(--color-primary);
+    color: var(--color-primary);
+    font-weight: var(--font-weight-bold);
+}
+
+.photoRow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.photoAddButton {
+    position: relative;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    flex-shrink: 0;
+
+    width: 84px;
+    height: 72px;
+
+    background-color: var(--color-background-neutral);
+    border-radius: var(--radius-medium);
+    color: var(--color-text-muted);
+    font-size: var(--font-size-caption);
+
+    cursor: pointer;
+}
+
+.photoAddButton img {
+    display: block;
+    width: 18px;
+    height: 18px;
+}
+
+.photoInput {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.photoInput:disabled {
+    cursor: default;
+}
+
+.photoHint {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: var(--font-size-meta);
+}
+
+.photoPreviewRow {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.photoPreview {
+    position: relative;
+
+    width: 64px;
+    height: 64px;
+
+    border-radius: var(--radius-medium);
+    overflow: hidden;
+}
+
+.photoPreview img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.photoRemoveButton {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 18px;
+    height: 18px;
+    padding: 0;
+
+    background-color: rgb(27 39 51 / 65%);
+    border: 0;
+    border-radius: var(--radius-circle);
+    color: var(--color-white);
+    font-size: 12px;
+    line-height: 1;
+
+    cursor: pointer;
+}
+
+.footer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+
+    padding: 16px 24px 20px;
+    border-top: 1px solid var(--color-background-neutral);
+}
+
+.cancelButton,
+.submitButton {
+    flex: 1 0 0;
+    padding: 13px 20px;
+
+    border-radius: var(--radius-pill);
+    font-family: inherit;
+    font-size: var(--font-size-card-title);
+    font-weight: var(--font-weight-bold);
+
+    cursor: pointer;
+}
+
+.cancelButton {
+    background-color: var(--color-white);
+    border: 1px solid var(--color-border-default);
+    color: var(--color-text-secondary);
+}
+
+.submitButton {
+    background-color: var(--color-primary);
+    border: 0;
+    color: var(--color-white);
+}
+
+.submitButton:hover:not(:disabled) {
+    background-color: var(--color-primary-hover);
+}
+
+.submitButton:disabled {
+    opacity: 0.6;
+    cursor: default;
+}
