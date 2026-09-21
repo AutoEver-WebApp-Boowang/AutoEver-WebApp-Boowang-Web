@@ -101,17 +101,19 @@ export function ParkingRegisterModal({
 
     const handlePhotoSelect = (event: ChangeEvent<HTMLInputElement>) => {
         const files = event.target.files
-        event.target.value = ''
 
         if (!files || files.length === 0) return
 
         const remainingSlots = MAX_PHOTO_COUNT - photoFiles.length
-        if (remainingSlots <= 0) return
+        const selectedFiles = Array.from(files).slice(0, remainingSlots)
 
-        setPhotoFiles((current) => [
-            ...current,
-            ...Array.from(files).slice(0, remainingSlots),
-        ])
+        // input.value를 먼저 비우면 브라우저에 따라 위에서 참조한 files가
+        // 같은 FileList 객체라 함께 비워질 수 있어서, 배열로 복사한 뒤에 초기화한다.
+        event.target.value = ''
+
+        if (selectedFiles.length === 0) return
+
+        setPhotoFiles((current) => [...current, ...selectedFiles])
     }
 
     const handlePhotoRemove = (index: number) => {
