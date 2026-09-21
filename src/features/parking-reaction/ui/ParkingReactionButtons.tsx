@@ -35,53 +35,62 @@ export function ParkingReactionButtons({
             accessToken!,
             tokenType!,
         ),
-        onError: () => {
-            window.alert('처리 중 문제가 발생했어요. 다시 시도해주세요.')
-        },
     })
 
-    const handleRecommend = () => {
+    const handleRecommend = async () => {
         if (!isAuthenticated) {
             onRequireLogin()
             return
         }
 
-        if (reaction === 'recommend') {
-            setReaction(null)
-            setRecommendCount((count) => Math.max(count - 1, 0))
-            reactionMutation.mutate(null)
-            return
-        }
+        const nextReaction = reaction === 'recommend' ? null : 'recommend'
 
-        if (reaction === 'notRecommend') {
-            setNotRecommendCount((count) => Math.max(count - 1, 0))
-        }
+        try {
+            await reactionMutation.mutateAsync(nextReaction)
 
-        setReaction('recommend')
-        setRecommendCount((count) => count + 1)
-        reactionMutation.mutate('recommend')
+            if (nextReaction === null) {
+                setReaction(null)
+                setRecommendCount((count) => Math.max(count - 1, 0))
+                return
+            }
+
+            if (reaction === 'notRecommend') {
+                setNotRecommendCount((count) => Math.max(count - 1, 0))
+            }
+
+            setReaction('recommend')
+            setRecommendCount((count) => count + 1)
+        } catch {
+            window.alert('처리 중 문제가 발생했어요. 다시 시도해주세요.')
+        }
     }
 
-    const handleNotRecommend = () => {
+    const handleNotRecommend = async () => {
         if (!isAuthenticated) {
             onRequireLogin()
             return
         }
 
-        if (reaction === 'notRecommend') {
-            setReaction(null)
-            setNotRecommendCount((count) => Math.max(count - 1, 0))
-            reactionMutation.mutate(null)
-            return
-        }
+        const nextReaction = reaction === 'notRecommend' ? null : 'notRecommend'
 
-        if (reaction === 'recommend') {
-            setRecommendCount((count) => Math.max(count - 1, 0))
-        }
+        try {
+            await reactionMutation.mutateAsync(nextReaction)
 
-        setReaction('notRecommend')
-        setNotRecommendCount((count) => count + 1)
-        reactionMutation.mutate('notRecommend')
+            if (nextReaction === null) {
+                setReaction(null)
+                setNotRecommendCount((count) => Math.max(count - 1, 0))
+                return
+            }
+
+            if (reaction === 'recommend') {
+                setRecommendCount((count) => Math.max(count - 1, 0))
+            }
+
+            setReaction('notRecommend')
+            setNotRecommendCount((count) => count + 1)
+        } catch {
+            window.alert('처리 중 문제가 발생했어요. 다시 시도해주세요.')
+        }
     }
 
     return (
@@ -90,6 +99,7 @@ export function ParkingReactionButtons({
                 type="button"
                 className={reaction === 'recommend' ? styles.selected : undefined}
                 aria-pressed={reaction === 'recommend'}
+                disabled={reactionMutation.isPending}
                 onClick={handleRecommend}
             >
                 <img
@@ -105,6 +115,7 @@ export function ParkingReactionButtons({
                 type="button"
                 className={reaction === 'notRecommend' ? styles.selected : undefined}
                 aria-pressed={reaction === 'notRecommend'}
+                disabled={reactionMutation.isPending}
                 onClick={handleNotRecommend}
             >
                 <img
