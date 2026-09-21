@@ -25,3 +25,22 @@ export async function getMyProfileApi(
     const result: ApiResponse<UserProfileResponse> = await response.json()
     return toUserProfile(result.data)
 }
+
+export async function withdrawApi(
+    accessToken: string,
+    tokenType: string,
+): Promise<void> {
+    const response = await fetch(
+        `${env.apiBaseUrl}/api/v1/users/me`,
+        {
+            method: 'DELETE',
+            headers: {
+                Authorization: `${tokenType} ${accessToken}`,
+            },
+        },
+    )
+
+    if (!response.ok) {
+        throw new Error(`회원 탈퇴 실패: ${response.status}`)
+    }
+}

@@ -164,3 +164,28 @@
     opacity: 0.5;
     cursor: default;
 }
+
+.withdrawSection {
+    display: flex;
+    justify-content: center;
+    padding: 4px 20px 24px;
+}
+
+.withdrawButton {
+    padding: 0;
+    background: none;
+    border: 0;
+    color: var(--color-text-muted);
+    font-size: var(--font-size-meta);
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.withdrawButton:hover {
+    color: var(--color-text-supporting);
+}
+
+.withdrawButton:disabled {
+    opacity: 0.5;
+    cursor: default;
+}

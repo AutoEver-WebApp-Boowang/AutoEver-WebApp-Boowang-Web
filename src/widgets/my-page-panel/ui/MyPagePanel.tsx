@@ -2,6 +2,7 @@ import {useQuery} from '@tanstack/react-query'
 import {useAppSelector} from '@/app/providers/store/hooks.ts'
 import {getMyProfile} from '@/entities/user/api/userRepository'
 import {useLogout} from '@/entities/user/model/useLogout'
+import {useWithdraw} from '@/entities/user/model/useWithdraw'
 import {LoginPrompt} from '@/widgets/login-prompt'
 import styles from './MyPagePanel.module.css'
 
@@ -43,6 +44,18 @@ export function MyPagePanel() {
     const tokenType = useAppSelector((state) => state.auth.tokenType)
 
     const logoutMutation = useLogout()
+    const withdrawMutation = useWithdraw()
+
+    const handleWithdraw = () => {
+        const confirmed = window.confirm('정말 탈퇴하시겠어요? 탈퇴하면 계정 정보를 되돌릴 수 없어요.')
+        if (!confirmed) return
+
+        withdrawMutation.mutate(undefined, {
+            onError: (error) => {
+                window.alert(error instanceof Error ? error.message : '회원 탈퇴에 실패했어요. 다시 시도해주세요.')
+            },
+        })
+    }
 
     const myProfileQuery = useQuery({
         queryKey: ['user', 'me'],
@@ -130,6 +143,17 @@ export function MyPagePanel() {
                             </svg>
                             버그 제보 / 의견 남기기
                         </a>
+                    </div>
+
+                    <div className={styles.withdrawSection}>
+                        <button
+                            type="button"
+                            className={styles.withdrawButton}
+                            onClick={handleWithdraw}
+                            disabled={withdrawMutation.isPending}
+                        >
+                            회원 탈퇴
+                        </button>
                     </div>
                 </>
             )}

@@ -11,3 +11,7 @@ export async function getMyProfileMockApi(): Promise<UserProfile> {
         },
     }
 }
+
+export async function withdrawMockApi(): Promise<void> {
+    return
+}

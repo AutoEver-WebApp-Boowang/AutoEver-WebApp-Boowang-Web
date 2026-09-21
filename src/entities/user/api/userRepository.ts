@@ -1,6 +1,6 @@
 import {env} from '@/shared/config'
-import {getMyProfileApi} from './userApi'
-import {getMyProfileMockApi} from './userMockApi'
+import {getMyProfileApi, withdrawApi} from './userApi'
+import {getMyProfileMockApi, withdrawMockApi} from './userMockApi'
 import type {UserProfile} from '../model/types'
 
 export function getMyProfile(accessToken: string, tokenType: string): Promise<UserProfile> {
@@ -8,4 +8,11 @@ export function getMyProfile(accessToken: string, tokenType: string): Promise<Us
         return getMyProfileMockApi()
     }
     return getMyProfileApi(accessToken, tokenType)
+}
+
+export function withdraw(accessToken: string, tokenType: string): Promise<void> {
+    if (env.apiMode === 'mock') {
+        return withdrawMockApi()
+    }
+    return withdrawApi(accessToken, tokenType)
 }
