@@ -1,7 +1,7 @@
 import {env} from '@/shared/config'
 import {createApiReview, getApiParkingReviews, updateApiReviewLike} from './reviewApi'
 import {createMockReview, getMockParkingReviews, updateMockReviewLike} from './reviewMockApi'
-import type {CreateReviewInput, ParkingReviewData, ReviewLikeResult} from '../model/types'
+import type {CreateReviewInput, ParkingReviewPage, ReviewLikeResult} from '../model/types'
 
 export function createReview(
     input: CreateReviewInput,
@@ -18,15 +18,17 @@ export function createReview(
 
 export function getParkingReviews(
     parkingId: number,
+    page: number,
+    size: number,
     accessToken: string,
     tokenType: string,
     signal?: AbortSignal,
-): Promise<ParkingReviewData[]> {
+): Promise<ParkingReviewPage> {
     if (env.apiMode === 'mock') {
-        return getMockParkingReviews(parkingId, signal)
+        return getMockParkingReviews(parkingId, page, size, signal)
     }
 
-    return getApiParkingReviews(parkingId, accessToken, tokenType, signal)
+    return getApiParkingReviews(parkingId, page, size, accessToken, tokenType, signal)
 }
 
 export function updateReviewLike(

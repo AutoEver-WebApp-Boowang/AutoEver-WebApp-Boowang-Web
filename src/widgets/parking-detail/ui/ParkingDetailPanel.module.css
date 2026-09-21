@@ -1,15 +1,23 @@
 .panel {
+    display: flex;
     width: 100%;
     height: 100%;
-    overflow-y: auto;
+    flex-direction: column;
+    overflow: hidden;
     color: var(--color-text-primary);
     background-color: var(--color-background-panel);
     border-radius: var(--radius-large);
     box-shadow: 0 8px 24px rgb(27 39 51 / 18%);
+}
+
+.tabScroll {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
     scrollbar-width: none;
 }
 
-.panel::-webkit-scrollbar {
+.tabScroll::-webkit-scrollbar {
     display: none;
 }
 
@@ -526,4 +534,8 @@
 .editSaveButton:disabled {
     opacity: 0.6;
     cursor: default;
+}
+
+.reviewLoadMoreSentinel {
+    height: 1px;
 }

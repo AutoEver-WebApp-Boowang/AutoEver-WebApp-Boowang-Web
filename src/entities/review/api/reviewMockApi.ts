@@ -1,5 +1,5 @@
 import {mockParkingReviews} from '../model/mock'
-import type {CreateReviewInput, ParkingReviewData, ReviewLikeResult} from '../model/types'
+import type {CreateReviewInput, ParkingReviewData, ParkingReviewPage, ReviewLikeResult} from '../model/types'
 
 export async function createMockReview(
     {parkingId, content}: CreateReviewInput,
@@ -20,15 +20,22 @@ export async function createMockReview(
 
 export async function getMockParkingReviews(
     parkingId: number,
+    page: number,
+    size: number,
     signal?: AbortSignal,
-): Promise<ParkingReviewData[]> {
+): Promise<ParkingReviewPage> {
     if (signal?.aborted) {
         throw new DOMException('요청이 취소되었습니다.', 'AbortError')
     }
 
-    return mockParkingReviews.filter(
+    const allReviews = mockParkingReviews.filter(
         (review) => review.parkingId === parkingId,
     )
+
+    return {
+        reviews: allReviews.slice(page * size, page * size + size),
+        totalCount: allReviews.length,
+    }
 }
 
 export async function updateMockReviewLike(

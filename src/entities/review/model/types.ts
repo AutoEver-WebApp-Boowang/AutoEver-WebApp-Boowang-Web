@@ -17,3 +17,8 @@ export type CreateReviewInput = {
     parkingId: number
     content: string
 }
+
+export type ParkingReviewPage = {
+    reviews: ParkingReviewData[]
+    totalCount: number
+}

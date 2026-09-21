@@ -1,5 +1,5 @@
-import {useRef, useState} from 'react'
-import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
+import {useEffect, useRef, useState} from 'react'
+import {type InfiniteData, useInfiniteQuery, useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
 import {
     deleteParking,
     getParkingDetail,
@@ -32,6 +32,7 @@ type DetailTab = 'home' | 'reviews'
 const SLIDE_WIDTH = 320
 const SLIDE_GAP = 12
 const SLIDE_VIEWPORT_WIDTH = 348
+const REVIEW_PAGE_SIZE = 10
 
 const formatDate = (date: string | null) => {
     if (!date) return '확인 정보 없음'
@@ -57,6 +58,8 @@ export function ParkingDetailPanel({parkingId, favoriteParkingIds, onClose, onRe
     const [editHasRoof, setEditHasRoof] = useState(false)
     const dragStartX = useRef(0)
     const hasDragged = useRef(false)
+    const tabScrollRef = useRef<HTMLDivElement>(null)
+    const reviewLoadMoreRef = useRef<HTMLDivElement>(null)
     const queryClient = useQueryClient()
 
 
@@ -72,36 +75,80 @@ export function ParkingDetailPanel({parkingId, favoriteParkingIds, onClose, onRe
         retry: false,
     })
 
-    const parkingReviewsQuery = useQuery({
+    const parkingReviewsQuery = useInfiniteQuery({
         queryKey: ['parking', 'reviews', parkingId],
-        queryFn: ({signal}) => getParkingReviews(parkingId, accessToken!, tokenType!, signal),
+        queryFn: ({pageParam, signal}) => getParkingReviews(
+            parkingId,
+            pageParam,
+            REVIEW_PAGE_SIZE,
+            accessToken!,
+            tokenType!,
+            signal,
+        ),
+        initialPageParam: 0,
+        getNextPageParam: (lastPage, allPages) => {
+            const loadedCount = allPages.reduce((sum, page) => sum + page.reviews.length, 0)
+            return loadedCount < lastPage.totalCount ? allPages.length : undefined
+        },
         enabled: activeTab === 'reviews' && isAuthenticated,
         retry: false,
     })
+
+    // 리뷰 탭 스크롤 영역 맨 아래에 도달하면 다음 페이지를 불러온다 (무한 스크롤)
+    useEffect(() => {
+        if (activeTab !== 'reviews') return
+
+        const sentinel = reviewLoadMoreRef.current
+        const scrollRoot = tabScrollRef.current
+
+        if (!sentinel || !scrollRoot) return
+
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting && parkingReviewsQuery.hasNextPage && !parkingReviewsQuery.isFetchingNextPage) {
+                    void parkingReviewsQuery.fetchNextPage()
+                }
+            },
+            {root: scrollRoot, threshold: 0.1},
+        )
+
+        observer.observe(sentinel)
+
+        return () => observer.disconnect()
+    }, [activeTab, parkingReviewsQuery.hasNextPage, parkingReviewsQuery.isFetchingNextPage, parkingReviewsQuery.fetchNextPage])
 
     const reviewLikeMutation = useMutation({
         mutationFn: ({reviewId, isCurrentlyLiked}: {
             reviewId: number
             isCurrentlyLiked: boolean
         }) => {
-            const currentLikeCount = parkingReviewsQuery.data?.find(
-                (review) => review.id === reviewId,
-            )?.likeCount ?? 0
+            const currentLikeCount = parkingReviewsQuery.data?.pages
+                .flatMap((page) => page.reviews)
+                .find((review) => review.id === reviewId)
+                ?.likeCount ?? 0
 
             return updateReviewLike(reviewId, isCurrentlyLiked, currentLikeCount, accessToken!, tokenType!)
         },
         onSuccess: (result, {reviewId}) => {
-            queryClient.setQueryData<ParkingReviewData[]>(
+            queryClient.setQueryData<InfiniteData<{reviews: ParkingReviewData[]; totalCount: number}>>(
                 ['parking', 'reviews', parkingId],
-                (currentReviews = []) => currentReviews.map((review) => (
-                    review.id === reviewId
-                        ? {
-                            ...review,
-                            isLiked: result.isLiked,
-                            likeCount: result.likeCount,
-                        }
-                        : review
-                )),
+                (currentData) => currentData
+                    ? {
+                        ...currentData,
+                        pages: currentData.pages.map((page) => ({
+                            ...page,
+                            reviews: page.reviews.map((review) => (
+                                review.id === reviewId
+                                    ? {
+                                        ...review,
+                                        isLiked: result.isLiked,
+                                        likeCount: result.likeCount,
+                                    }
+                                    : review
+                            )),
+                        })),
+                    }
+                    : currentData,
             )
         },
     })
@@ -191,7 +238,7 @@ export function ParkingDetailPanel({parkingId, favoriteParkingIds, onClose, onRe
     })
 
     const parkingDetail = parkingDetailQuery.data
-    const parkingReviews = parkingReviewsQuery.data ?? []
+    const parkingReviews = parkingReviewsQuery.data?.pages.flatMap((page) => page.reviews) ?? []
     const errorMessage = parkingDetailQuery.error instanceof Error
         ? parkingDetailQuery.error.message
         : null
@@ -485,6 +532,7 @@ export function ParkingDetailPanel({parkingId, favoriteParkingIds, onClose, onRe
                 </button>
             </div>
 
+            <div className={styles.tabScroll} ref={tabScrollRef}>
             {activeTab === 'home' ? (
                 <div className={styles.homeContent} role="tabpanel">
                     <dl className={styles.information}>
@@ -611,7 +659,7 @@ export function ParkingDetailPanel({parkingId, favoriteParkingIds, onClose, onRe
                         <p className={styles.emptyReviews}>
                             리뷰는 로그인 후 확인할 수 있어요.
                         </p>
-                    ) : parkingReviewsQuery.isFetching ? (
+                    ) : parkingReviewsQuery.isLoading ? (
                         <div className={styles.reviewLoading} role="status" aria-live="polite">
                             <span className={styles.reviewLoadingSpinner} aria-hidden="true"/>
                             <span>리뷰를 불러오는 중입니다.</span>
@@ -621,16 +669,25 @@ export function ParkingDetailPanel({parkingId, favoriteParkingIds, onClose, onRe
                             {reviewsError}
                         </p>
                     ) : parkingReviews.length > 0 ? (
-                        <ul className={styles.reviewList}>
-                            {parkingReviews.map((review) => (
-                                <li key={review.id}>
-                                    <ReviewCard
-                                        review={review}
-                                        onLike={handleReviewLike}
-                                    />
-                                </li>
-                            ))}
-                        </ul>
+                        <>
+                            <ul className={styles.reviewList}>
+                                {parkingReviews.map((review) => (
+                                    <li key={review.id}>
+                                        <ReviewCard
+                                            review={review}
+                                            onLike={handleReviewLike}
+                                        />
+                                    </li>
+                                ))}
+                            </ul>
+                            <div ref={reviewLoadMoreRef} className={styles.reviewLoadMoreSentinel} aria-hidden="true"/>
+                            {parkingReviewsQuery.isFetchingNextPage && (
+                                <div className={styles.reviewLoading} role="status" aria-live="polite">
+                                    <span className={styles.reviewLoadingSpinner} aria-hidden="true"/>
+                                    <span>리뷰를 더 불러오는 중입니다.</span>
+                                </div>
+                            )}
+                        </>
                     ) : (
                         <p className={styles.emptyReviews}>
                             아직 등록된 리뷰가 없습니다.
@@ -657,6 +714,7 @@ export function ParkingDetailPanel({parkingId, favoriteParkingIds, onClose, onRe
                     )}
                 </div>
             )}
+            </div>
         </article>
     )
 }
