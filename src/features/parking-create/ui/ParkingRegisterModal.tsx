@@ -7,6 +7,7 @@ import {getAddressFromCoordinate} from '../lib/getAddressFromCoordinate'
 import styles from './ParkingRegisterModal.module.css'
 
 const MAX_PHOTO_COUNT = 3
+const PLACE_TYPE = '제보' as const
 
 type ParkingRegisterModalProps = {
     currentPosition: CurrentPosition | null
@@ -34,7 +35,6 @@ export function ParkingRegisterModal({
     const [geocodeError, setGeocodeError] = useState<string | null>(null)
 
     const [name, setName] = useState('')
-    const [placeType, setPlaceType] = useState<'공영' | '제보'>('공영')
     const [isFree, setIsFree] = useState(true)
     const [operatingHours, setOperatingHours] = useState('')
     const [capacity, setCapacity] = useState('')
@@ -128,7 +128,7 @@ export function ParkingRegisterModal({
                     address,
                     latitude: currentPosition.latitude,
                     longitude: currentPosition.longitude,
-                    type: placeType,
+                    type: PLACE_TYPE,
                     isFree,
                     hasRoof,
                     operatingHours: operatingHours.trim(),
@@ -237,20 +237,9 @@ export function ParkingRegisterModal({
                             주차장 종류 <span className={styles.required}>필수</span>
                         </p>
                         <div className={styles.segmentedGroup}>
-                            <button
-                                type="button"
-                                className={placeType === '공영' ? styles.segmentSelected : styles.segment}
-                                onClick={() => setPlaceType('공영')}
-                            >
-                                공영
-                            </button>
-                            <button
-                                type="button"
-                                className={placeType === '제보' ? styles.segmentSelected : styles.segment}
-                                onClick={() => setPlaceType('제보')}
-                            >
+                            <span className={styles.segmentSelected}>
                                 노상 · 제보
-                            </button>
+                            </span>
                         </div>
                     </section>
 
