@@ -53,15 +53,17 @@ export function ParkingCard(
                     {parking.distanceMeters !== null ? formatDistanceMeters(parking.distanceMeters) : '거리 정보 없음'}
                 </span>
             </div>
-            <ul aria-label={"주차장 속성"} className={styles.attributes}>
-                <li className={parking.source === 'public' ? styles.publicBadge : styles.userBadge}>
-                    {parking.source === 'public' ? '공영' : '제보'}
-                </li>
-                <li>{parking.isFree ? '무료' : '유료'}</li>
-                <li>{parking.hasRoof ? '지붕 있음' : '지붕 없음'}</li>
-                {/* 거리 바로 아래, 속성 뱃지와 같은 줄에 리뷰 수 노출 */}
-                <li className={styles.reviewCount}>리뷰 {parking.reviewCount}</li>
-            </ul>
+            {/* 속성 뱃지 줄 오른쪽 끝(거리 바로 아래)에 리뷰 수를 일반 텍스트로 표시 */}
+            <div className={styles.attributesRow}>
+                <ul aria-label={"주차장 속성"} className={styles.attributes}>
+                    <li className={parking.source === 'public' ? styles.publicBadge : styles.userBadge}>
+                        {parking.source === 'public' ? '공영' : '제보'}
+                    </li>
+                    <li>{parking.isFree ? '무료' : '유료'}</li>
+                    <li>{parking.hasRoof ? '지붕 있음' : '지붕 없음'}</li>
+                </ul>
+                <span className={styles.reviewCount}>리뷰 {parking.reviewCount}</span>
+            </div>
             <ul aria-label={"운영 시간"} className={styles.hours}>
                 <li>{parking.operatingHours ?? '운영시간 정보 없음'}</li>
             </ul>

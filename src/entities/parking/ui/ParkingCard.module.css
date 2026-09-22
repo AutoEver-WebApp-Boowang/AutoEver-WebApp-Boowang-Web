@@ -70,9 +70,24 @@
     list-style: none;
 }
 
+.attributesRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-card-gap);
+}
+
 .attributes {
     flex-wrap: wrap;
     gap: var(--spacing-card-row);
+}
+
+.reviewCount {
+    flex-shrink: 0;
+    color: var(--color-text-supporting);
+    font-size: var(--font-size-meta);
+    line-height: 18px;
+    white-space: nowrap;
 }
 
 .attributes li {
