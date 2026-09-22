@@ -17,6 +17,7 @@ export function toParkingCardData(place: PlaceSummaryResponse): ParkingCardData 
         likeCount: place.recommendCount,
         dislikeCount: place.notRecommendCount,
         lastVerifiedAt: place.lastConfirmedAt,
+        reviewCount: place.reviewCount,
     }
 }
 

@@ -12,6 +12,7 @@ export type PlaceSummaryResponse = {
     lastConfirmedAt: string
     recommendCount: number
     notRecommendCount: number
+    reviewCount: number
 }
 
 export type PlaceDetailResponse = {

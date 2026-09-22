@@ -20,6 +20,7 @@ export type ParkingCardData = {
     likeCount: number
     dislikeCount: number
     lastVerifiedAt: string | null
+    reviewCount: number
 }
 
 export type ParkingReactionType = 'recommend' | 'notRecommend' | null

@@ -16,6 +16,7 @@ export const mockParkingCards: ParkingCardData[] = [
         likeCount: 24,
         dislikeCount: 2,
         lastVerifiedAt: '2026-09-12T10:30:00',
+        reviewCount: 8,
     },
     {
         id: 2,
@@ -32,6 +33,7 @@ export const mockParkingCards: ParkingCardData[] = [
         likeCount: 8,
         dislikeCount: 1,
         lastVerifiedAt: '2026-09-14T07:00:00',
+        reviewCount: 3,
     },
     {
         id: 3,
@@ -48,6 +50,7 @@ export const mockParkingCards: ParkingCardData[] = [
         likeCount: 56,
         dislikeCount: 3,
         lastVerifiedAt: '2026-09-13T14:20:00',
+        reviewCount: 14,
     },
     {
         id: 4,
@@ -64,6 +67,7 @@ export const mockParkingCards: ParkingCardData[] = [
         likeCount: 12,
         dislikeCount: 0,
         lastVerifiedAt: '2026-09-11T18:10:00',
+        reviewCount: 5,
     },
     {
         id: 5,
@@ -80,5 +84,6 @@ export const mockParkingCards: ParkingCardData[] = [
         likeCount: 33,
         dislikeCount: 1,
         lastVerifiedAt: '2026-09-14T06:30:00',
+        reviewCount: 9,
     },
 ]

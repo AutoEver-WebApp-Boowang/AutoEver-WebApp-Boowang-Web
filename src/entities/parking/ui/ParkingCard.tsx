@@ -73,6 +73,10 @@ export function ParkingCard(
                         <img src="/icons/thumb-down.svg" alt="" aria-hidden="true"/>
                         {parking.dislikeCount}
                     </li>
+                    {/* 스웨거에 리스트 카드용 reviewCount 필드가 추가돼서 노출 */}
+                    <li className={styles.reviewCount}>
+                        리뷰 {parking.reviewCount}
+                    </li>
                 </ul>
                 <span className={styles.lastVerifiedAt}>
                     최근 확인 {getTimeAgo(parking.lastVerifiedAt)}
