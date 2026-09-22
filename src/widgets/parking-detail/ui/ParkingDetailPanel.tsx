@@ -137,7 +137,7 @@ export function ParkingDetailPanel({parkingId, favoriteParkingIds, onClose, onRe
             return updateReviewLike(reviewId, isCurrentlyLiked, currentLikeCount, accessToken!, tokenType!)
         },
         onSuccess: (result, {reviewId}) => {
-            queryClient.setQueryData<InfiniteData<{reviews: ParkingReviewData[]; totalCount: number}>>(
+            queryClient.setQueryData<InfiniteData<{ reviews: ParkingReviewData[]; totalCount: number }>>(
                 ['parking', 'reviews', parkingId],
                 (currentData) => currentData
                     ? {
@@ -186,6 +186,37 @@ export function ParkingDetailPanel({parkingId, favoriteParkingIds, onClose, onRe
             accessToken!,
             tokenType!,
         ),
+
+        // 요청 보내기 전에 낙관적으로 먼저 바꿔줌
+        onMutate: async () => {
+            // 지금 이 detail 쿼리에 대해 진행 중인 refetch가 있으면 취소
+            await queryClient.cancelQueries({
+                queryKey: ['parking', 'detail', parkingId, accessToken],
+            })
+
+            // 실패했을 때 되돌릴 수 있도록 현재 캐시 값을 스냡샷
+            const previousDetail = queryClient.getQueryData<ParkingDetailData>(
+                ['parking', 'detail', parkingId, accessToken],
+            )
+
+            //isFavorite만 반전시켜서 화면에 바로 반영 (버튼이 즉시 눌린 것처럼 보임)
+            queryClient.setQueryData<ParkingDetailData>(
+                ['parking', 'detail', parkingId, accessToken],
+                (currentDetail) => currentDetail ? {...currentDetail, isFavorite: !currentDetail.isFavorite} : currentDetail,
+            )
+
+            return{previousDetail}
+        },
+
+        // 요청 실패 시 롤백
+        onError: (_error, _variables, context) => {
+            if (context?.previousDetail) {
+                queryClient.setQueryData<ParkingDetailData>(
+                    ['parking', 'detail', parkingId, accessToken],
+                    context.previousDetail
+                )
+            }
+        },
         onSuccess: (result) => {
             queryClient.setQueryData<ParkingDetailData>(
                 ['parking', 'detail', parkingId, accessToken],
@@ -540,190 +571,191 @@ export function ParkingDetailPanel({parkingId, favoriteParkingIds, onClose, onRe
             </div>
 
             <div className={styles.tabScroll} ref={tabScrollRef}>
-            {activeTab === 'home' ? (
-                <div className={styles.homeContent} role="tabpanel">
-                    <dl className={styles.information}>
-                        <div className={styles.informationItem}>
-                            <dt>주소</dt>
-                            <dd>{parkingDetail.address}</dd>
-                        </div>
-                        {parkingDetail.detailAddress && (
+                {activeTab === 'home' ? (
+                    <div className={styles.homeContent} role="tabpanel">
+                        <dl className={styles.information}>
                             <div className={styles.informationItem}>
-                                <dt>상세 주소</dt>
-                                <dd>{parkingDetail.detailAddress}</dd>
+                                <dt>주소</dt>
+                                <dd>{parkingDetail.address}</dd>
                             </div>
-                        )}
-                        <div className={styles.informationItem}>
-                            <dt>이용 요금</dt>
-                            {isEditMode ? (
-                                <dd>
-                                    <input
-                                        className={styles.editInput}
-                                        type="text"
-                                        value={editFeeDescription}
-                                        onChange={(event) => setEditFeeDescription(event.target.value)}
-                                        placeholder="예: 시간당 1,000원"
-                                    />
-                                </dd>
-                            ) : (
-                                <dd>{parkingDetail.isFree ? '무료' : parkingDetail.feeDescription ?? '요금 정보 없음'}</dd>
-                            )}
-                        </div>
-                        <div className={styles.informationItem}>
-                            <dt>주차 가능 대수</dt>
-                            {isEditMode ? (
-                                <dd>
-                                    <input
-                                        className={styles.editInput}
-                                        type="number"
-                                        min={0}
-                                        value={editCapacity}
-                                        onChange={(event) => setEditCapacity(event.target.value)}
-                                        placeholder="예: 15"
-                                    />
-                                </dd>
-                            ) : (
-                                <dd>{parkingDetail.capacity !== null ? `${parkingDetail.capacity}대` : '정보 없음'}</dd>
-                            )}
-                        </div>
-                        <div className={styles.informationItem}>
-                            <dt>시설 조건</dt>
-                            {isEditMode ? (
-                                <dd>
-                                    <label className={styles.editCheckboxLabel}>
-                                        <input
-                                            type="checkbox"
-                                            checked={editHasRoof}
-                                            onChange={(event) => setEditHasRoof(event.target.checked)}
-                                        />
-                                        지붕 있음
-                                    </label>
-                                </dd>
-                            ) : (
-                                <dd>{parkingDetail.hasRoof ? '지붕 있음' : '지붕 없음'}</dd>
-                            )}
-                        </div>
-                        <div className={styles.informationItem}>
-                            <dt>최근 확인</dt>
-                            <dd>{formatDate(parkingDetail.lastConfirmedAt)}</dd>
-                        </div>
-                    </dl>
-
-                    {isEditMode && (
-                        <div className={styles.editActions}>
-                            <button
-                                type="button"
-                                className={styles.editCancelButton}
-                                onClick={() => setIsEditMode(false)}
-                            >
-                                취소
-                            </button>
-                            <button
-                                type="button"
-                                className={styles.editSaveButton}
-                                onClick={() => updateInfoMutation.mutate()}
-                                disabled={updateInfoMutation.isPending}
-                            >
-                                저장
-                            </button>
-                        </div>
-                    )}
-
-                    <ParkingReactionButtons
-                        parkingId={parkingId}
-                        initialReaction={parkingDetail.myReaction}
-                        initialRecommendCount={parkingDetail.recommendCount}
-                        initialNotRecommendCount={parkingDetail.notRecommendCount}
-                        isAuthenticated={isAuthenticated}
-                        accessToken={accessToken}
-                        tokenType={tokenType}
-                        onRequireLogin={onRequireLogin}
-                    />
-
-                    <section className={styles.description} aria-labelledby="parking-description-title">
-                        <h3 id="parking-description-title">설명</h3>
-                        <p>{parkingDetail.description ?? '등록된 주의사항이 없습니다.'}</p>
-                    </section>
-                </div>
-            ) : (
-                <div className={styles.reviewsContent} role="tabpanel" aria-label="리뷰">
-                    <div className={styles.reviewActions}>
-                        <button
-                            type="button"
-                            className={styles.reviewWriteButton}
-                            onClick={() => {
-                                if (!isAuthenticated) {
-                                    onRequireLogin()
-                                    return
-                                }
-                                setIsReviewFormOpen(true)
-                            }}
-                        >
-                            <img
-                                className={styles.reviewWriteIcon}
-                                src="/icons/review-write.svg"
-                                alt=""
-                                aria-hidden="true"
-                            />
-                            리뷰 쓰기
-                        </button>
-                    </div>
-
-                    {parkingReviewsQuery.isLoading ? (
-                        <div className={styles.reviewLoading} role="status" aria-live="polite">
-                            <span className={styles.reviewLoadingSpinner} aria-hidden="true"/>
-                            <span>리뷰를 불러오는 중입니다.</span>
-                        </div>
-                    ) : reviewsError ? (
-                        <p className={styles.emptyReviews}>
-                            {reviewsError}
-                        </p>
-                    ) : parkingReviews.length > 0 ? (
-                        <>
-                            <ul className={styles.reviewList}>
-                                {parkingReviews.map((review) => (
-                                    <li key={review.id}>
-                                        <ReviewCard
-                                            review={review}
-                                            onLike={handleReviewLike}
-                                        />
-                                    </li>
-                                ))}
-                            </ul>
-                            <div ref={reviewLoadMoreRef} className={styles.reviewLoadMoreSentinel} aria-hidden="true"/>
-                            {parkingReviewsQuery.isFetchingNextPage && (
-                                <div className={styles.reviewLoading} role="status" aria-live="polite">
-                                    <span className={styles.reviewLoadingSpinner} aria-hidden="true"/>
-                                    <span>리뷰를 더 불러오는 중입니다.</span>
+                            {parkingDetail.detailAddress && (
+                                <div className={styles.informationItem}>
+                                    <dt>상세 주소</dt>
+                                    <dd>{parkingDetail.detailAddress}</dd>
                                 </div>
                             )}
-                        </>
-                    ) : (
-                        <p className={styles.emptyReviews}>
-                            아직 등록된 리뷰가 없습니다.
-                        </p>
-                    )}
+                            <div className={styles.informationItem}>
+                                <dt>이용 요금</dt>
+                                {isEditMode ? (
+                                    <dd>
+                                        <input
+                                            className={styles.editInput}
+                                            type="text"
+                                            value={editFeeDescription}
+                                            onChange={(event) => setEditFeeDescription(event.target.value)}
+                                            placeholder="예: 시간당 1,000원"
+                                        />
+                                    </dd>
+                                ) : (
+                                    <dd>{parkingDetail.isFree ? '무료' : parkingDetail.feeDescription ?? '요금 정보 없음'}</dd>
+                                )}
+                            </div>
+                            <div className={styles.informationItem}>
+                                <dt>주차 가능 대수</dt>
+                                {isEditMode ? (
+                                    <dd>
+                                        <input
+                                            className={styles.editInput}
+                                            type="number"
+                                            min={0}
+                                            value={editCapacity}
+                                            onChange={(event) => setEditCapacity(event.target.value)}
+                                            placeholder="예: 15"
+                                        />
+                                    </dd>
+                                ) : (
+                                    <dd>{parkingDetail.capacity !== null ? `${parkingDetail.capacity}대` : '정보 없음'}</dd>
+                                )}
+                            </div>
+                            <div className={styles.informationItem}>
+                                <dt>시설 조건</dt>
+                                {isEditMode ? (
+                                    <dd>
+                                        <label className={styles.editCheckboxLabel}>
+                                            <input
+                                                type="checkbox"
+                                                checked={editHasRoof}
+                                                onChange={(event) => setEditHasRoof(event.target.checked)}
+                                            />
+                                            지붕 있음
+                                        </label>
+                                    </dd>
+                                ) : (
+                                    <dd>{parkingDetail.hasRoof ? '지붕 있음' : '지붕 없음'}</dd>
+                                )}
+                            </div>
+                            <div className={styles.informationItem}>
+                                <dt>최근 확인</dt>
+                                <dd>{formatDate(parkingDetail.lastConfirmedAt)}</dd>
+                            </div>
+                        </dl>
 
-                    {isReviewFormOpen && (
-                        <div
-                            className={styles.reviewFormLayer}
-                            onMouseDown={(event) => {
-                                if (event.target === event.currentTarget) {
-                                    setIsReviewFormOpen(false)
-                                }
-                            }}
-                        >
-                            <ReviewForm
-                                onSubmit={async (content) => {
-                                    await createReviewMutation.mutateAsync(content)
-                                    setIsReviewFormOpen(false)
+                        {isEditMode && (
+                            <div className={styles.editActions}>
+                                <button
+                                    type="button"
+                                    className={styles.editCancelButton}
+                                    onClick={() => setIsEditMode(false)}
+                                >
+                                    취소
+                                </button>
+                                <button
+                                    type="button"
+                                    className={styles.editSaveButton}
+                                    onClick={() => updateInfoMutation.mutate()}
+                                    disabled={updateInfoMutation.isPending}
+                                >
+                                    저장
+                                </button>
+                            </div>
+                        )}
+
+                        <ParkingReactionButtons
+                            parkingId={parkingId}
+                            initialReaction={parkingDetail.myReaction}
+                            initialRecommendCount={parkingDetail.recommendCount}
+                            initialNotRecommendCount={parkingDetail.notRecommendCount}
+                            isAuthenticated={isAuthenticated}
+                            accessToken={accessToken}
+                            tokenType={tokenType}
+                            onRequireLogin={onRequireLogin}
+                        />
+
+                        <section className={styles.description} aria-labelledby="parking-description-title">
+                            <h3 id="parking-description-title">설명</h3>
+                            <p>{parkingDetail.description ?? '등록된 주의사항이 없습니다.'}</p>
+                        </section>
+                    </div>
+                ) : (
+                    <div className={styles.reviewsContent} role="tabpanel" aria-label="리뷰">
+                        <div className={styles.reviewActions}>
+                            <button
+                                type="button"
+                                className={styles.reviewWriteButton}
+                                onClick={() => {
+                                    if (!isAuthenticated) {
+                                        onRequireLogin()
+                                        return
+                                    }
+                                    setIsReviewFormOpen(true)
                                 }}
-                                onClose={() => setIsReviewFormOpen(false)}
-                            />
+                            >
+                                <img
+                                    className={styles.reviewWriteIcon}
+                                    src="/icons/review-write.svg"
+                                    alt=""
+                                    aria-hidden="true"
+                                />
+                                리뷰 쓰기
+                            </button>
                         </div>
-                    )}
-                </div>
-            )}
+
+                        {parkingReviewsQuery.isLoading ? (
+                            <div className={styles.reviewLoading} role="status" aria-live="polite">
+                                <span className={styles.reviewLoadingSpinner} aria-hidden="true"/>
+                                <span>리뷰를 불러오는 중입니다.</span>
+                            </div>
+                        ) : reviewsError ? (
+                            <p className={styles.emptyReviews}>
+                                {reviewsError}
+                            </p>
+                        ) : parkingReviews.length > 0 ? (
+                            <>
+                                <ul className={styles.reviewList}>
+                                    {parkingReviews.map((review) => (
+                                        <li key={review.id}>
+                                            <ReviewCard
+                                                review={review}
+                                                onLike={handleReviewLike}
+                                            />
+                                        </li>
+                                    ))}
+                                </ul>
+                                <div ref={reviewLoadMoreRef} className={styles.reviewLoadMoreSentinel}
+                                     aria-hidden="true"/>
+                                {parkingReviewsQuery.isFetchingNextPage && (
+                                    <div className={styles.reviewLoading} role="status" aria-live="polite">
+                                        <span className={styles.reviewLoadingSpinner} aria-hidden="true"/>
+                                        <span>리뷰를 더 불러오는 중입니다.</span>
+                                    </div>
+                                )}
+                            </>
+                        ) : (
+                            <p className={styles.emptyReviews}>
+                                아직 등록된 리뷰가 없습니다.
+                            </p>
+                        )}
+
+                        {isReviewFormOpen && (
+                            <div
+                                className={styles.reviewFormLayer}
+                                onMouseDown={(event) => {
+                                    if (event.target === event.currentTarget) {
+                                        setIsReviewFormOpen(false)
+                                    }
+                                }}
+                            >
+                                <ReviewForm
+                                    onSubmit={async (content) => {
+                                        await createReviewMutation.mutateAsync(content)
+                                        setIsReviewFormOpen(false)
+                                    }}
+                                    onClose={() => setIsReviewFormOpen(false)}
+                                />
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
         </article>
     )

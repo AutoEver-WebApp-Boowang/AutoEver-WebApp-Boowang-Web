@@ -1,4 +1,4 @@
-import {useState} from 'react'
+import {useEffect, useState} from 'react'
 import {useMutation, useQueryClient} from '@tanstack/react-query'
 import {updateParkingReaction, type ParkingCardData, type ParkingDetailData, type ParkingReactionType} from '@/entities/parking'
 import styles from './ParkingReactionButtons.module.css'
@@ -76,6 +76,12 @@ export function ParkingReactionButtons({
             )),
         )
     }
+
+    useEffect(() => {
+        setReaction(initialReaction)
+        setRecommendCount(initialRecommendCount)
+        setNotRecommendCount(initialNotRecommendCount)
+    }, [initialReaction, initialRecommendCount, initialNotRecommendCount])
 
     const handleRecommend = async () => {
         if (!isAuthenticated) {
