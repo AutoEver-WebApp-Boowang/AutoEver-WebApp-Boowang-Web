@@ -133,7 +133,6 @@
 
 .likeCount,
 .dislikeCount,
-.reviewCount,
 .lastVerifiedAt {
     white-space: nowrap;
 }

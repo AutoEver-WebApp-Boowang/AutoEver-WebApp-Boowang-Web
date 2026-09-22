@@ -59,6 +59,8 @@ export function ParkingCard(
                 </li>
                 <li>{parking.isFree ? '무료' : '유료'}</li>
                 <li>{parking.hasRoof ? '지붕 있음' : '지붕 없음'}</li>
+                {/* 거리 바로 아래, 속성 뱃지와 같은 줄에 리뷰 수 노출 */}
+                <li className={styles.reviewCount}>리뷰 {parking.reviewCount}</li>
             </ul>
             <ul aria-label={"운영 시간"} className={styles.hours}>
                 <li>{parking.operatingHours ?? '운영시간 정보 없음'}</li>
@@ -72,10 +74,6 @@ export function ParkingCard(
                     <li className={styles.dislikeCount}>
                         <img src="/icons/thumb-down.svg" alt="" aria-hidden="true"/>
                         {parking.dislikeCount}
-                    </li>
-                    {/* 스웨거에 리스트 카드용 reviewCount 필드가 추가돼서 노출 */}
-                    <li className={styles.reviewCount}>
-                        리뷰 {parking.reviewCount}
                     </li>
                 </ul>
                 <span className={styles.lastVerifiedAt}>
