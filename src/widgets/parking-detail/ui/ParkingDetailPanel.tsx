@@ -87,8 +87,8 @@ export function ParkingDetailPanel({parkingId, favoriteParkingIds, onClose, onRe
             parkingId,
             pageParam,
             REVIEW_PAGE_SIZE,
-            accessToken!,
-            tokenType!,
+            accessToken,
+            tokenType,
             signal,
         ),
         initialPageParam: 0,
@@ -96,7 +96,8 @@ export function ParkingDetailPanel({parkingId, favoriteParkingIds, onClose, onRe
             const loadedCount = allPages.reduce((sum, page) => sum + page.reviews.length, 0)
             return loadedCount < lastPage.totalCount ? allPages.length : undefined
         },
-        enabled: activeTab === 'reviews' && isAuthenticated,
+        // 리뷰 목록 조회는 비로그인 사용자도 볼 수 있어서 isAuthenticated 조건을 걸지 않는다.
+        enabled: activeTab === 'reviews',
         retry: false,
     })
 
@@ -668,11 +669,7 @@ export function ParkingDetailPanel({parkingId, favoriteParkingIds, onClose, onRe
                         </button>
                     </div>
 
-                    {!isAuthenticated ? (
-                        <p className={styles.emptyReviews}>
-                            리뷰는 로그인 후 확인할 수 있어요.
-                        </p>
-                    ) : parkingReviewsQuery.isLoading ? (
+                    {parkingReviewsQuery.isLoading ? (
                         <div className={styles.reviewLoading} role="status" aria-live="polite">
                             <span className={styles.reviewLoadingSpinner} aria-hidden="true"/>
                             <span>리뷰를 불러오는 중입니다.</span>

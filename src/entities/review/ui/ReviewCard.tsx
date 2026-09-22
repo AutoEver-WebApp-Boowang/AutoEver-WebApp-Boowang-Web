@@ -25,9 +25,13 @@ export function ReviewCard({review, onLike}: ReviewCardProps) {
 
     const handleLikeClick = async () => {
         if (isLikeSubmitting) return
-
+        const previousIsLiked = isLiked
+        const previousLikeCount = likeCount
         try {
             setIsLikeSubmitting(true)
+
+            setIsLiked(!isLiked)
+            setLikeCount(isLiked ? likeCount - 1 : likeCount + 1)
 
             const result = await onLike(review.id, isLiked)
 
@@ -35,6 +39,8 @@ export function ReviewCard({review, onLike}: ReviewCardProps) {
             setLikeCount(result.likeCount)
         } catch {
             // 로그인이 필요해서 취소된 경우 등 - 상태 변경 없이 무시
+            setIsLiked(previousIsLiked)
+            setLikeCount(previousLikeCount)
         } finally {
             setIsLikeSubmitting(false)
         }

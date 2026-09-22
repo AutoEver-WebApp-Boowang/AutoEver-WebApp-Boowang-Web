@@ -32,17 +32,21 @@ export async function getApiParkingReviews(
     parkingId: number,
     page: number,
     size: number,
-    accessToken: string,
-    tokenType: string,
+    accessToken: string | null,
+    tokenType: string | null,
     signal?: AbortSignal,
 ): Promise<ParkingReviewPage> {
+    // 리뷰 목록 조회는 비로그인 사용자도 볼 수 있어서 토큰이 없을 수 있다.
+    // 이 경우 Authorization 헤더 자체를 생략한다.
+    const headers: HeadersInit = accessToken && tokenType
+        ? {Authorization: `${tokenType} ${accessToken}`}
+        : {}
+
     const response = await fetch(
         `${env.apiBaseUrl}/api/places/${parkingId}/reviews?page=${page}&size=${size}`,
         {
             signal,
-            headers: {
-                Authorization: `${tokenType} ${accessToken}`,
-            },
+            headers,
         },
     )
 

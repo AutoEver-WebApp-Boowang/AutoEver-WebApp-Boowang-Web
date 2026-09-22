@@ -20,8 +20,8 @@ export function getParkingReviews(
     parkingId: number,
     page: number,
     size: number,
-    accessToken: string,
-    tokenType: string,
+    accessToken: string | null,
+    tokenType: string | null,
     signal?: AbortSignal,
 ): Promise<ParkingReviewPage> {
     if (env.apiMode === 'mock') {
