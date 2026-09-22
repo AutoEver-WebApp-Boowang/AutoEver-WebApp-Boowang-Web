@@ -58,7 +58,6 @@ export function ReviewCard({review, onLike}: ReviewCardProps) {
                     type="button"
                     className={`${styles.likeButton} ${isLiked ? styles.liked : ''}`}
                     aria-pressed={isLiked}
-                    disabled={isLikeSubmitting}
                     onClick={handleLikeClick}
                 >
                     <img
@@ -69,7 +68,7 @@ export function ReviewCard({review, onLike}: ReviewCardProps) {
                         alt=""
                         aria-hidden="true"
                     />
-                    {isLikeSubmitting ? '처리 중...' : `좋아요 ${likeCount}`}
+                    좋아요 {likeCount}
                 </button>
             </footer>
         </article>
