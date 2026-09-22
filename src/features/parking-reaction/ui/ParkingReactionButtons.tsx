@@ -85,30 +85,30 @@ export function ParkingReactionButtons({
 
         const nextReaction = reaction === 'recommend' ? null : 'recommend'
 
+        const previousReaction = reaction
+        const previousRecommendCount = recommendCount
+        const previousNotRecommendCount = notRecommendCount
+
+        const nextRecommendCount = nextReaction === null
+            ? Math.max(recommendCount - 1, 0)
+            : recommendCount + 1
+        const nextNotRecommendCount = nextReaction === 'recommend' && reaction === 'notRecommend'
+            ? Math.max(notRecommendCount - 1, 0)
+            : notRecommendCount
+
+        setReaction(nextReaction)
+        setRecommendCount(nextRecommendCount)
+        setNotRecommendCount(nextNotRecommendCount)
+        syncCaches(nextReaction, nextRecommendCount, nextNotRecommendCount)
+
         try {
             await reactionMutation.mutateAsync(nextReaction)
-
-            if (nextReaction === null) {
-                const nextRecommendCount = Math.max(recommendCount - 1, 0)
-                setReaction(null)
-                setRecommendCount(nextRecommendCount)
-                syncCaches(null, nextRecommendCount, notRecommendCount)
-                return
-            }
-
-            const nextNotRecommendCount = reaction === 'notRecommend'
-                ? Math.max(notRecommendCount - 1, 0)
-                : notRecommendCount
-            const nextRecommendCount = recommendCount + 1
-
-            if (reaction === 'notRecommend') {
-                setNotRecommendCount(nextNotRecommendCount)
-            }
-
-            setReaction('recommend')
-            setRecommendCount(nextRecommendCount)
-            syncCaches('recommend', nextRecommendCount, nextNotRecommendCount)
         } catch {
+            setReaction(previousReaction)
+            setRecommendCount(previousRecommendCount)
+            setNotRecommendCount(previousNotRecommendCount)
+            syncCaches(previousReaction, previousRecommendCount, previousNotRecommendCount)
+
             window.alert('처리 중 문제가 발생했어요. 다시 시도해주세요.')
         }
     }
@@ -121,30 +121,30 @@ export function ParkingReactionButtons({
 
         const nextReaction = reaction === 'notRecommend' ? null : 'notRecommend'
 
+        const previousReaction = reaction
+        const previousRecommendCount = recommendCount
+        const previousNotRecommendCount = notRecommendCount
+
+        const nextNotRecommendCount = nextReaction === null
+            ? Math.max(notRecommendCount - 1, 0)
+            : notRecommendCount + 1
+        const nextRecommendCount = nextReaction === 'notRecommend' && reaction === 'recommend'
+            ? Math.max(recommendCount - 1, 0)
+            : recommendCount
+
+        setReaction(nextReaction)
+        setRecommendCount(nextRecommendCount)
+        setNotRecommendCount(nextNotRecommendCount)
+        syncCaches(nextReaction, nextRecommendCount, nextNotRecommendCount)
+
         try {
             await reactionMutation.mutateAsync(nextReaction)
-
-            if (nextReaction === null) {
-                const nextNotRecommendCount = Math.max(notRecommendCount - 1, 0)
-                setReaction(null)
-                setNotRecommendCount(nextNotRecommendCount)
-                syncCaches(null, recommendCount, nextNotRecommendCount)
-                return
-            }
-
-            const nextRecommendCount = reaction === 'recommend'
-                ? Math.max(recommendCount - 1, 0)
-                : recommendCount
-            const nextNotRecommendCount = notRecommendCount + 1
-
-            if (reaction === 'recommend') {
-                setRecommendCount(nextRecommendCount)
-            }
-
-            setReaction('notRecommend')
-            setNotRecommendCount(nextNotRecommendCount)
-            syncCaches('notRecommend', nextRecommendCount, nextNotRecommendCount)
         } catch {
+            setReaction(previousReaction)
+            setRecommendCount(previousRecommendCount)
+            setNotRecommendCount(previousNotRecommendCount)
+            syncCaches(previousReaction, previousRecommendCount, previousNotRecommendCount)
+
             window.alert('처리 중 문제가 발생했어요. 다시 시도해주세요.')
         }
     }
