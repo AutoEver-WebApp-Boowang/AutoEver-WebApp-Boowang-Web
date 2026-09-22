@@ -1,4 +1,4 @@
-import {useState} from 'react'
+import {useEffect, useState} from 'react'
 import type {ParkingReviewData, ReviewLikeResult} from '../model/types'
 import styles from './ReviewCard.module.css'
 
@@ -22,6 +22,14 @@ export function ReviewCard({review, onLike}: ReviewCardProps) {
     const [isLiked, setIsLiked] = useState(review.isLiked)
     const [likeCount, setLikeCount] = useState(review.likeCount)
     const [isLikeSubmitting, setIsLikeSubmitting] = useState(false)
+
+    // review.isLiked/likeCount는 로그인 상태에 따라 값이 달라지는데(로그아웃 시 캐시가
+    // 비워지고 다시 받아온 값), 컴포넌트가 계속 마운트된 채로 남아있으면 useState 초기값은
+    // 그대로라 화면이 안 바뀐다. props가 바뀌면 로컬 상태도 같이 맞춰준다.
+    useEffect(() => {
+        setIsLiked(review.isLiked)
+        setLikeCount(review.likeCount)
+    }, [review.isLiked, review.likeCount])
 
     const handleLikeClick = async () => {
         if (isLikeSubmitting) return
