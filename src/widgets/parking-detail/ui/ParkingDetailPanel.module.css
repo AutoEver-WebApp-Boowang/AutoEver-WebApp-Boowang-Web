@@ -307,6 +307,7 @@
 }
 
 .tabs {
+    position: relative;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     height: 52px;
@@ -320,21 +321,44 @@
     color: var(--color-text-muted);
     background: transparent;
     border: 0;
-    border-bottom: 3px solid transparent;
     font: inherit;
     font-size: var(--font-size-section-title);
     cursor: pointer;
+    transition: color 0.2s ease;
 }
 
 .tabs .activeTab {
     color: var(--color-text-primary);
-    border-bottom-color: var(--color-primary);
     font-weight: var(--font-weight-bold);
+}
+
+/* 탭을 전환할 때 밑줄이 눌린 탭 쪽으로 이동하는 애니메이션 */
+.tabIndicator {
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    height: 3px;
+    background-color: var(--color-primary);
+    transition: transform 0.25s ease, width 0.25s ease;
+    pointer-events: none;
 }
 
 .homeContent,
 .reviewsContent {
     padding: 18px var(--spacing-detail-padding) 24px;
+    animation: tabContentFadeIn 0.2s ease;
+}
+
+@keyframes tabContentFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(4px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .information {

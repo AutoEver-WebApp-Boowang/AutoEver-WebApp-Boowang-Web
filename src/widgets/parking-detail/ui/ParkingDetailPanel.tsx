@@ -61,6 +61,9 @@ export function ParkingDetailPanel({parkingId, favoriteParkingIds, onClose, onRe
     const hasDragged = useRef(false)
     const tabScrollRef = useRef<HTMLDivElement>(null)
     const reviewLoadMoreRef = useRef<HTMLDivElement>(null)
+    const homeTabRef = useRef<HTMLButtonElement>(null)
+    const reviewsTabRef = useRef<HTMLButtonElement>(null)
+    const [tabIndicatorStyle, setTabIndicatorStyle] = useState({left: 0, width: 0})
     const queryClient = useQueryClient()
 
 
@@ -101,6 +104,16 @@ export function ParkingDetailPanel({parkingId, favoriteParkingIds, onClose, onRe
         enabled: activeTab === 'reviews',
         retry: false,
     })
+
+    useEffect(() => {
+        const activeTabElement = activeTab === 'home' ? homeTabRef.current : reviewsTabRef.current
+        if (!activeTabElement) return
+
+        setTabIndicatorStyle({
+            left: activeTabElement.offsetLeft,
+            width: activeTabElement.offsetWidth,
+        })
+    }, [activeTab])
 
     // 리뷰 탭 스크롤 영역 맨 아래에 도달하면 다음 페이지를 불러온다 (무한 스크롤)
     useEffect(() => {
@@ -552,6 +565,7 @@ export function ParkingDetailPanel({parkingId, favoriteParkingIds, onClose, onRe
 
             <div className={styles.tabs} role="tablist" aria-label="상세 정보 메뉴">
                 <button
+                    ref={homeTabRef}
                     type="button"
                     role="tab"
                     className={activeTab === 'home' ? styles.activeTab : undefined}
@@ -561,6 +575,7 @@ export function ParkingDetailPanel({parkingId, favoriteParkingIds, onClose, onRe
                     홈
                 </button>
                 <button
+                    ref={reviewsTabRef}
                     type="button"
                     role="tab"
                     className={activeTab === 'reviews' ? styles.activeTab : undefined}
@@ -569,6 +584,11 @@ export function ParkingDetailPanel({parkingId, favoriteParkingIds, onClose, onRe
                 >
                     리뷰
                 </button>
+                <span
+                    className={styles.tabIndicator}
+                    style={{transform: `translateX(${tabIndicatorStyle.left}px)`, width: tabIndicatorStyle.width}}
+                    aria-hidden="true"
+                />
             </div>
 
             <div className={styles.tabScroll} ref={tabScrollRef}>
