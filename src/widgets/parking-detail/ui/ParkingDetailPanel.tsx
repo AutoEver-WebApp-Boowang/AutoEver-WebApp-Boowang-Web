@@ -19,6 +19,7 @@ import {ReviewForm} from '@/features/review-create'
 import {ParkingImageModal} from './ParkingImageModal'
 import styles from './ParkingDetailPanel.module.css'
 import {useAppSelector} from "@/app/providers/store/hooks.ts";
+import {parseServerDate} from '@/shared/lib/date'
 
 type ParkingDetailPanelProps = {
     parkingId: number
@@ -41,7 +42,7 @@ const formatDate = (date: string | null) => {
         year: 'numeric',
         month: 'short',
         day: 'numeric',
-    }).format(new Date(date))
+    }).format(parseServerDate(date))
 }
 
 export function ParkingDetailPanel({parkingId, favoriteParkingIds, onClose, onRequireLogin}: ParkingDetailPanelProps) {

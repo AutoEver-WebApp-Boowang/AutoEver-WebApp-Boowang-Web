@@ -1,5 +1,6 @@
 import {useEffect, useState} from 'react'
 import type {ParkingReviewData, ReviewLikeResult} from '../model/types'
+import {parseServerDate} from '@/shared/lib/date'
 import styles from './ReviewCard.module.css'
 
 type ReviewCardProps = {
@@ -15,7 +16,7 @@ const formatReviewDate = (createdAt: string) => {
         year: 'numeric',
         month: 'long',
         day: 'numeric',
-    }).format(new Date(createdAt))
+    }).format(parseServerDate(createdAt))
 }
 
 export function ReviewCard({review, onLike}: ReviewCardProps) {

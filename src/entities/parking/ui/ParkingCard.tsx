@@ -1,5 +1,6 @@
 import type {ParkingCardData} from '../model/types'
 import {formatDistanceMeters} from '@/shared/lib/geo'
+import {parseServerDate} from '@/shared/lib/date'
 import styles from './ParkingCard.module.css'
 
 type ParkingCardProps = {
@@ -12,7 +13,7 @@ type ParkingCardProps = {
 const getTimeAgo = (date: string | null) => {
     if (!date) return '정보 없음'
 
-    const verifiedTime = new Date(date).getTime()
+    const verifiedTime = parseServerDate(date).getTime()
 
     if (Number.isNaN(verifiedTime)) return '정보 없음'
 
