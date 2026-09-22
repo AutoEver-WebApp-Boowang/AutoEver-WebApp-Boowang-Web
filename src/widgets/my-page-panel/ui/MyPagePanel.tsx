@@ -70,7 +70,15 @@ export function MyPagePanel() {
     })
 
     if (!isAuthenticated) {
-        return <LoginPrompt description="마이페이지는 로그인 후 이용할 수 있어요"/>
+        return (
+            <section className={styles.panel}>
+                <header className={styles.header}>
+                    <h2>마이페이지</h2>
+                </header>
+
+                <LoginPrompt description="마이페이지는 로그인 후 이용할 수 있어요"/>
+            </section>
+        )
     }
 
     return (
