@@ -8,6 +8,9 @@ type AuthState = {
     accessToken: string | null
     tokenType: string | null
     expiresIn: number | null
+    // 소셜 로그인 콜백 이후 토큰 재발급(refresh)이 실패했을 때(예: 서드파티 쿠키 차단) true.
+    // 사용자에게 재시도 UI를 보여주는 용도.
+    socialLoginFailed: boolean
 }
 
 type SetCredentialsPayload = {
@@ -24,6 +27,7 @@ const initialState: AuthState = {
     accessToken: null,
     tokenType: null,
     expiresIn: null,
+    socialLoginFailed: false,
 }
 
 const authSlice = createSlice({
@@ -33,6 +37,9 @@ const authSlice = createSlice({
         setAuthChecking: (state, action: PayloadAction<boolean>) => {
             state.isAuthChecking = action.payload
         },
+        setSocialLoginFailed: (state, action: PayloadAction<boolean>) => {
+            state.socialLoginFailed = action.payload
+        },
         setCredentials: (state, action: PayloadAction<SetCredentialsPayload>) => {
             state.user = action.payload.user
             state.accessToken = action.payload.accessToken
@@ -40,7 +47,7 @@ const authSlice = createSlice({
             state.expiresIn = action.payload.expiresIn
             state.isAuthenticated = true
             state.isAuthChecking = false
-
+            state.socialLoginFailed = false
         },
         clearAuth: (state) => {
             state.user = null
@@ -53,5 +60,5 @@ const authSlice = createSlice({
     },
 })
 
-export const {clearAuth, setAuthChecking, setCredentials} = authSlice.actions
+export const {clearAuth, setAuthChecking, setCredentials, setSocialLoginFailed} = authSlice.actions
 export const authReducer = authSlice.reducer

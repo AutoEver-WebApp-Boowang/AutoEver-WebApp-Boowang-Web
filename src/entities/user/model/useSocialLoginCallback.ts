@@ -1,5 +1,5 @@
 import {useEffect} from 'react'
-import {setCredentials} from '@/entities/user'
+import {setCredentials, setSocialLoginFailed} from '@/entities/user'
 import {decodeAccessTokenUserId} from '@/entities/user/lib/jwt'
 import {refreshAccessToken} from '@/entities/user/api/authRepository'
 import {getMyProfile} from '@/entities/user/api/userRepository'
@@ -30,6 +30,10 @@ export function useSocialLoginCallback() {
                 tokenType: tokens.tokenType,
                 expiresIn: tokens.expiresIn,
             }))
+        }).catch(() => {
+            // 서드파티 쿠키 차단 등으로 refreshToken 쿠키를 못 읽어오면 여기서 조용히 실패했었음.
+            // 재시도 UI(SocialLoginRetryBanner)를 띄우기 위한 플래그만 세워둔다.
+            dispatch(setSocialLoginFailed(true))
         })
 
         // URL에 소셜 로그인 처리 쿼리가 남아있지 않도록 정리

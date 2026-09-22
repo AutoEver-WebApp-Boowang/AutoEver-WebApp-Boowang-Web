@@ -1,0 +1,54 @@
+.banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 10px 16px;
+    background-color: var(--color-danger, #e53935);
+    color: var(--color-white);
+    font-size: var(--font-size-meta);
+}
+
+.actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.retryButton {
+    padding: 4px 12px;
+    color: var(--color-danger, #e53935);
+    background-color: var(--color-white);
+    border: 0;
+    border-radius: 12px;
+    font: inherit;
+    font-weight: var(--font-weight-bold);
+    cursor: pointer;
+}
+
+.retryButton:disabled {
+    opacity: 0.6;
+    cursor: default;
+}
+
+.closeButton {
+    padding: 0 4px;
+    color: var(--color-white);
+    background: none;
+    border: 0;
+    font-size: var(--font-size-body);
+    cursor: pointer;
+}
+
+.retryErrorMessage {
+    position: absolute;
+    top: 100%;
+    margin: 4px 0 0;
+    color: var(--color-danger, #e53935);
+    font-size: var(--font-size-meta);
+}
